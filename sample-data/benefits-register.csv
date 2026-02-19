@@ -1,0 +1,22 @@
+Project,Benefit Name,Expected Annual Benefit,Realised Benefit to Date,Benefit Status,Benefit Category,Benefit Owner,Target Realisation Date,Confidence,Notes
+Alpha - Platform Rebuild,Reduced hosting costs (cloud migration),120000,0,Not Started,Cost Saving,Alice Chen,2026-09-30,Medium,Dependent on full platform migration. Cannot realise until legacy decommissioned
+Alpha - Platform Rebuild,Faster feature delivery (modern stack),200000,0,Not Started,Efficiency,Bob Martinez,2026-12-31,Medium,Measured by reduction in release cycle time. Baseline: 4 weeks
+Alpha - Platform Rebuild,New payment options revenue uplift,350000,0,Not Started,Revenue,Charlie Kim,2027-01-31,Low,High uncertainty. Depends on payment gateway v2 which is blocked
+Beta - Mobile App Launch,Mobile channel revenue,500000,0,Not Started,Revenue,Grace Wilson,2027-03-31,Medium,Conservative estimate based on 5% conversion of web users to mobile
+Beta - Mobile App Launch,Customer engagement improvement,80000,0,Not Started,Strategic,Hannah Lee,2027-06-30,Low,Difficult to quantify. Based on reduced churn assumption
+Gamma - Legacy Decommission,Licence cost avoidance,300000,150000,Partial,Cost Avoidance,Leo Nakamura,2026-06-30,High,"Phase 1 realised £150k. Phase 2 (£150k) at risk due to migration delays"
+Gamma - Legacy Decommission,Support cost reduction,85000,0,Delayed,Cost Saving,Maria Santos,2026-09-30,Low,Cannot reduce support team until all legacy systems fully decommissioned
+Delta - Customer Portal,Customer satisfaction improvement,60000,0,On Track,Strategic,Nora Bell,2026-12-31,High,Measured by NPS increase. Portal on track for Q3 pilot
+Delta - Customer Portal,Support ticket reduction,95000,0,On Track,Cost Saving,Oscar Rivera,2027-01-31,Medium,Target: 30% reduction in tier-1 support tickets through self-service
+Epsilon - Compliance Programme,Regulatory penalty avoidance,2000000,0,At Risk,Risk Mitigation,Priya Sharma,2026-03-31,Low,"Non-compliance penalty estimated at £2M. Training on hold — risk of missing audit deadline"
+Zeta - Data Warehouse,Data-driven decision uplift,400000,0,Not Started,Efficiency,Sam Cooper,2027-06-30,Medium,Hard to measure. Based on estimated time savings across 50 analysts
+Zeta - Data Warehouse,Report automation savings,150000,0,Not Started,Cost Saving,Tom Walsh,2027-03-31,Medium,Replace 3 manual reporting FTEs. Requires gold layer completion
+Eta - Process Automation,Invoice processing savings,45000,12000,Partial,Cost Saving,Wendy Chen,2026-06-30,High,Bot in UAT. £12k already realised from pilot. Full rollout expected by May
+Eta - Process Automation,Onboarding time reduction,35000,0,On Track,Efficiency,Victor Lee,2026-09-30,Medium,Target: 50% reduction in new starter admin time
+Eta - Process Automation,Reporting automation,25000,0,Not Started,Efficiency,Victor Lee,2026-12-31,Medium,
+Theta - Office Relocation,Reduced rent costs,180000,0,On Track,Cost Saving,Xavier Dunn,2026-07-01,High,New lease 25% cheaper. Saving confirmed in signed lease
+Theta - Office Relocation,Improved collaboration (open plan),50000,0,Not Started,Strategic,Zara Okafor,2026-12-31,Low,Very difficult to quantify. Based on survey-based productivity estimates
+Iota - Marketing Platform,Lead generation improvement,200000,0,At Risk,Revenue,Amy Brooks,2026-09-30,Low,"80% of budget spent, but data migration delays pushing go-live to Q3. May miss summer campaign window"
+Kappa - Cyber Security,Breach cost avoidance,500000,0,On Track,Risk Mitigation,Chris Lee,2026-04-30,High,"Based on average breach cost for mid-size firm. Critical vulns already patched, EDR 85% deployed"
+Lambda - HR System,HR admin time reduction,160000,0,Delayed,Efficiency,Emma Scott,2027-01-31,Low,Project on hold for 3 months. Benefit timeline slipping. May need to re-baseline
+Lambda - HR System,Employee experience improvement,40000,0,Delayed,Strategic,Emma Scott,2027-06-30,Low,Cannot start until system implemented

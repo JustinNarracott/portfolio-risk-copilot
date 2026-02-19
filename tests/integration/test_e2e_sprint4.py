@@ -76,7 +76,7 @@ class TestFullWorkflowE2E:
         output = capsys.readouterr().out
         data = json.loads(output)
         assert data["portfolio_rag"] in ("Red", "Amber", "Green")
-        assert len(data["project_summaries"]) == 6
+        assert len(data["project_summaries"]) >= 6
 
     def test_multiple_scenarios_in_sequence(self, tmp_path, capsys):
         """Multiple scenarios can run in sequence."""

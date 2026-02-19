@@ -1,0 +1,70 @@
+Project,Project Status,Start Date,End Date,Budget,Actual Spend,Task Name,Task Status,Priority,Assignee,Sprint,Previous Sprints,Comments
+Alpha - Platform Rebuild,In Progress,2026-01-06,2026-06-30,450000,210000,Design system architecture,Done,High,Alice Chen,Sprint 5,,Completed ahead of schedule
+Alpha - Platform Rebuild,In Progress,2026-01-06,2026-06-30,450000,210000,Build user authentication API,In Progress,High,Bob Martinez,Sprint 5,,Blocked by infrastructure team - no ETA on shared services migration
+Alpha - Platform Rebuild,In Progress,2026-01-06,2026-06-30,450000,210000,Implement payment gateway v2,Blocked,Critical,Charlie Kim,Sprint 5,Sprint 3;Sprint 4,Blocked by third-party vendor API changes. Vendor unresponsive since 2026-01-20. Escalated to vendor account manager
+Alpha - Platform Rebuild,In Progress,2026-01-06,2026-06-30,450000,210000,Frontend dashboard build,In Progress,High,Diana Patel,Sprint 5,,Depends on API completion from Bob. Started with mock data
+Alpha - Platform Rebuild,In Progress,2026-01-06,2026-06-30,450000,210000,Database migration to PostgreSQL,In Progress,Critical,Eve Washington,Sprint 5,Sprint 4,Carried over from Sprint 4 - underestimated complexity of legacy schema. 60% complete
+Alpha - Platform Rebuild,In Progress,2026-01-06,2026-06-30,450000,210000,API rate limiting and throttling,To Do,Medium,Bob Martinez,Sprint 6,,Depends on authentication API
+Alpha - Platform Rebuild,In Progress,2026-01-06,2026-06-30,450000,210000,Load testing and performance tuning,To Do,High,Frank Torres,Sprint 6,,Waiting for database migration to complete
+Alpha - Platform Rebuild,In Progress,2026-01-06,2026-06-30,450000,210000,Security audit and penetration testing,To Do,Critical,External Vendor,Sprint 7,,Depends on payment gateway and auth API completion. Vendor booked for March
+Beta - Mobile App Launch,Planning,2026-02-01,2026-08-31,280000,35000,Requirements gathering,Done,High,Grace Wilson,Sprint 2,,Completed. Scope signed off by sponsor
+Beta - Mobile App Launch,Planning,2026-02-01,2026-08-31,280000,35000,UX/UI design and prototyping,In Progress,High,Hannah Lee,Sprint 4,Sprint 3,Carried over - client feedback required 2 additional design rounds
+Beta - Mobile App Launch,Planning,2026-02-01,2026-08-31,280000,35000,Backend API development,To Do,Critical,Ivan Torres,Sprint 5,,Blocked by Alpha API authentication - need shared auth service first
+Beta - Mobile App Launch,Planning,2026-02-01,2026-08-31,280000,35000,iOS development,To Do,High,Julia Park,Sprint 6,,Depends on UX sign-off and backend API
+Beta - Mobile App Launch,Planning,2026-02-01,2026-08-31,280000,35000,Android development,To Do,High,Kevin Zhang,Sprint 6,,Depends on UX sign-off and backend API
+Beta - Mobile App Launch,Planning,2026-02-01,2026-08-31,280000,35000,App store submission preparation,To Do,Medium,Grace Wilson,Sprint 8,,
+Beta - Mobile App Launch,Planning,2026-02-01,2026-08-31,280000,35000,Push notification service,In Progress,Medium,Ivan Torres,Sprint 4,Sprint 3;Sprint 4,Carried over twice. Depends on backend API which depends on Alpha auth
+Gamma - Legacy Decommission,At Risk,2025-09-01,2026-06-30,180000,162000,Phase 1 system shutdown,Done,High,Leo Nakamura,Sprint 2,,Successfully decommissioned 3 legacy services
+Gamma - Legacy Decommission,At Risk,2025-09-01,2026-06-30,180000,162000,Data migration to new platform,In Progress,Critical,Maria Santos,Sprint 5,Sprint 3;Sprint 4;Sprint 5,Third sprint carrying this over. Data quality issues in legacy system causing repeated failures
+Gamma - Legacy Decommission,At Risk,2025-09-01,2026-06-30,180000,162000,Legacy API redirects,In Progress,High,Leo Nakamura,Sprint 5,,Waiting for Alpha platform to be ready for traffic redirect
+Gamma - Legacy Decommission,At Risk,2025-09-01,2026-06-30,180000,162000,Licence termination and vendor exit,Blocked,Medium,Procurement Team,Sprint 5,,Blocked by legal review of termination clauses. Legal team backlogged
+Gamma - Legacy Decommission,At Risk,2025-09-01,2026-06-30,180000,162000,Phase 2 system shutdown,To Do,High,Leo Nakamura,Sprint 6,,Depends on data migration completion
+Gamma - Legacy Decommission,At Risk,2025-09-01,2026-06-30,180000,162000,Post-decommission monitoring,To Do,Low,Maria Santos,Sprint 7,,
+Delta - Customer Portal,In Progress,2026-01-15,2026-09-30,120000,28000,Portal wireframes and design,Done,Medium,Hannah Lee,Sprint 3,,Clean delivery. Client happy with designs
+Delta - Customer Portal,In Progress,2026-01-15,2026-09-30,120000,28000,Customer login and SSO integration,In Progress,High,Nora Bell,Sprint 5,,Going well. SSO provider integration smoother than expected
+Delta - Customer Portal,In Progress,2026-01-15,2026-09-30,120000,28000,Self-service dashboard build,In Progress,Medium,Oscar Rivera,Sprint 5,,On track. Using component library from Alpha
+Delta - Customer Portal,In Progress,2026-01-15,2026-09-30,120000,28000,Document upload and management,To Do,Medium,Oscar Rivera,Sprint 6,,
+Delta - Customer Portal,In Progress,2026-01-15,2026-09-30,120000,28000,Email notification system,To Do,Low,Nora Bell,Sprint 6,,
+Delta - Customer Portal,In Progress,2026-01-15,2026-09-30,120000,28000,UAT with pilot customers,To Do,High,Grace Wilson,Sprint 7,,5 pilot customers confirmed
+Epsilon - Compliance Programme,In Progress,2025-11-01,2026-03-31,95000,88000,Regulatory gap analysis,Done,Critical,Priya Sharma,Sprint 1,,Identified 12 compliance gaps
+Epsilon - Compliance Programme,In Progress,2025-11-01,2026-03-31,95000,88000,Policy documentation update,Done,High,Priya Sharma,Sprint 3,,All 12 policies updated and signed off
+Epsilon - Compliance Programme,In Progress,2025-11-01,2026-03-31,95000,88000,Staff training rollout,On Hold,Critical,Rachel Adams,Sprint 5,Sprint 4,On hold - training platform vendor went into administration. Sourcing replacement
+Epsilon - Compliance Programme,In Progress,2025-11-01,2026-03-31,95000,88000,Audit evidence collection,In Progress,High,Priya Sharma,Sprint 5,,70% complete but depends on training completion for full evidence pack
+Epsilon - Compliance Programme,In Progress,2025-11-01,2026-03-31,95000,88000,External audit preparation,To Do,Critical,Priya Sharma,Sprint 6,,Audit scheduled for 2026-04-15. Must have training complete by 2026-03-31
+Epsilon - Compliance Programme,In Progress,2025-11-01,2026-03-31,95000,88000,Remediation of audit findings,To Do,High,Rachel Adams,Sprint 7,,Contingency task - scope depends on audit outcomes
+Zeta - Data Warehouse,In Progress,2026-01-20,2026-12-31,320000,42000,Data architecture design,Done,High,Sam Cooper,Sprint 3,,Approved by CTO. Using medallion architecture
+Zeta - Data Warehouse,In Progress,2026-01-20,2026-12-31,320000,42000,Bronze layer ETL pipelines,In Progress,High,Tom Walsh,Sprint 5,,On track. 4 of 7 source systems connected
+Zeta - Data Warehouse,In Progress,2026-01-20,2026-12-31,320000,42000,Silver layer data quality rules,To Do,Medium,Sam Cooper,Sprint 6,,Depends on bronze layer completion
+Zeta - Data Warehouse,In Progress,2026-01-20,2026-12-31,320000,42000,Gold layer analytics views,To Do,Medium,Tom Walsh,Sprint 7,,
+Zeta - Data Warehouse,In Progress,2026-01-20,2026-12-31,320000,42000,Power BI dashboard integration,To Do,Low,Uma Patel,Sprint 8,,Business stakeholders requesting early access
+Zeta - Data Warehouse,In Progress,2026-01-20,2026-12-31,320000,42000,Data governance framework,In Progress,Medium,Sam Cooper,Sprint 5,,Running in parallel. Framework doc 80% complete
+Eta - Process Automation,In Progress,2026-02-10,2026-07-31,75000,18000,Process mapping and analysis,Done,Medium,Victor Lee,Sprint 3,,Identified 8 processes for automation. 3 high-value quick wins
+Eta - Process Automation,In Progress,2026-02-10,2026-07-31,75000,18000,RPA bot development - invoicing,In Progress,High,Wendy Chen,Sprint 5,,Quick win #1. Bot in UAT. Estimated 200hrs/year saving
+Eta - Process Automation,In Progress,2026-02-10,2026-07-31,75000,18000,RPA bot development - onboarding,In Progress,Medium,Wendy Chen,Sprint 5,,Quick win #2. 50% complete
+Eta - Process Automation,In Progress,2026-02-10,2026-07-31,75000,18000,RPA bot development - reporting,To Do,Medium,Victor Lee,Sprint 6,,Quick win #3
+Eta - Process Automation,In Progress,2026-02-10,2026-07-31,75000,18000,Integration testing,To Do,High,Victor Lee,Sprint 7,,
+Eta - Process Automation,In Progress,2026-02-10,2026-07-31,75000,18000,Process automation training,To Do,Low,Wendy Chen,Sprint 8,,
+Theta - Office Relocation,In Progress,2026-03-01,2026-06-15,200000,85000,New office lease negotiation,Done,Critical,Xavier Dunn,Sprint 2,,Lease signed. Under budget by 15k
+Theta - Office Relocation,In Progress,2026-03-01,2026-06-15,200000,85000,IT infrastructure planning,Done,High,Yuki Tanaka,Sprint 3,,Network and AV spec complete
+Theta - Office Relocation,In Progress,2026-03-01,2026-06-15,200000,85000,Furniture procurement,In Progress,Medium,Xavier Dunn,Sprint 5,,Lead time issues - standing desks delayed 6 weeks from supplier
+Theta - Office Relocation,In Progress,2026-03-01,2026-06-15,200000,85000,IT network installation,In Progress,High,Yuki Tanaka,Sprint 5,,Contractor on site. Running to plan
+Theta - Office Relocation,In Progress,2026-03-01,2026-06-15,200000,85000,Staff communication and move planning,In Progress,Medium,Zara Okafor,Sprint 5,,Town hall scheduled for next week
+Theta - Office Relocation,In Progress,2026-03-01,2026-06-15,200000,85000,Physical move execution,To Do,Critical,Xavier Dunn,Sprint 6,,Weekend move planned for 2026-05-23
+Theta - Office Relocation,In Progress,2026-03-01,2026-06-15,200000,85000,Post-move snagging and IT support,To Do,Medium,Yuki Tanaka,Sprint 7,,2 week hypercare window
+Iota - Marketing Platform,In Progress,2026-01-12,2026-05-31,65000,52000,Platform selection and procurement,Done,High,Amy Brooks,Sprint 2,,Selected HubSpot Enterprise
+Iota - Marketing Platform,In Progress,2026-01-12,2026-05-31,65000,52000,Data migration from legacy CRM,In Progress,High,Ben Taylor,Sprint 5,Sprint 4,Carried over. Data cleaning taking longer than estimated - 40k duplicate records found
+Iota - Marketing Platform,In Progress,2026-01-12,2026-05-31,65000,52000,Campaign template setup,In Progress,Medium,Amy Brooks,Sprint 5,,On track. 12 of 15 templates built
+Iota - Marketing Platform,In Progress,2026-01-12,2026-05-31,65000,52000,Integration with website and forms,To Do,High,Ben Taylor,Sprint 6,,Depends on data migration
+Iota - Marketing Platform,In Progress,2026-01-12,2026-05-31,65000,52000,Team training and go-live,To Do,Medium,Amy Brooks,Sprint 7,,Training slots booked for April
+Kappa - Cyber Security,In Progress,2025-10-01,2026-04-30,150000,128000,Vulnerability assessment,Done,Critical,Chris Lee,Sprint 1,,147 vulnerabilities found. 23 critical
+Kappa - Cyber Security,In Progress,2025-10-01,2026-04-30,150000,128000,Critical vulnerability remediation,Done,Critical,Chris Lee,Sprint 3,,All 23 critical vulns patched
+Kappa - Cyber Security,In Progress,2025-10-01,2026-04-30,150000,128000,Endpoint detection deployment,In Progress,High,Dana Kim,Sprint 5,,85% of endpoints covered. Remaining 15% are remote workers
+Kappa - Cyber Security,In Progress,2025-10-01,2026-04-30,150000,128000,Security awareness training,In Progress,Medium,Chris Lee,Sprint 5,Sprint 4,Carried over from Sprint 4. Completion rate at 62% - chasing stragglers
+Kappa - Cyber Security,In Progress,2025-10-01,2026-04-30,150000,128000,Incident response plan testing,To Do,High,Dana Kim,Sprint 6,,Tabletop exercise planned with exec team
+Kappa - Cyber Security,In Progress,2025-10-01,2026-04-30,150000,128000,SOC monitoring go-live,To Do,Critical,External Vendor,Sprint 6,,Depends on endpoint deployment completion. Vendor ready
+Lambda - HR System,On Hold,2026-01-05,2026-09-30,190000,15000,Requirements and vendor selection,Done,High,Emma Scott,Sprint 2,,3 vendors shortlisted
+Lambda - HR System,On Hold,2026-01-05,2026-09-30,190000,15000,Contract negotiation,Blocked,Critical,Procurement Team,Sprint 5,Sprint 3;Sprint 4;Sprint 5,Blocked for 3 months. Legal and procurement cannot agree terms with preferred vendor. Escalated to CFO
+Lambda - HR System,On Hold,2026-01-05,2026-09-30,190000,15000,System configuration,To Do,High,Emma Scott,Sprint TBD,,Cannot start until contract signed
+Lambda - HR System,On Hold,2026-01-05,2026-09-30,190000,15000,Data migration from legacy HR,To Do,High,Emma Scott,Sprint TBD,,Depends on system configuration
+Lambda - HR System,On Hold,2026-01-05,2026-09-30,190000,15000,User acceptance testing,To Do,Medium,HR Team,Sprint TBD,,
+Lambda - HR System,On Hold,2026-01-05,2026-09-30,190000,15000,Training and rollout,To Do,Medium,Emma Scott,Sprint TBD,,

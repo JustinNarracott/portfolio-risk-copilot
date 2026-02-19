@@ -61,6 +61,7 @@ SEVERITY_BADGES = {
 
 def generate_board_briefing(
     report: PortfolioRiskReport, brand: BrandConfig | None = None, output_path: str | Path | None = None,
+    benefit_report=None, investment_report=None,
 ) -> Path:
     """Generate a 1-page board briefing DOCX."""
     brand = brand or BrandConfig()
@@ -68,6 +69,10 @@ def generate_board_briefing(
     _apply_base_styles(doc, brand)
     _add_header_bar(doc, brand, _h(brand, "board_title", "Portfolio Health — Board Briefing"))
     _maybe_add_logo(doc, brand)
+    # Executive action summary — the "7am phone check" paragraph
+    from src.insights import generate_executive_summary
+    exec_summary = generate_executive_summary(report, benefit_report, investment_report)
+    _add_exec_action_box(doc, exec_summary, brand)
     _add_portfolio_dashboard(doc, report, brand)
     _add_section_heading(doc, brand, _h(brand, "project_table", "Project Overview"))
     _add_project_rag_table(doc, report, brand)
@@ -85,7 +90,7 @@ def generate_board_briefing(
 
 def generate_steering_pack(
     report: PortfolioRiskReport, brand: BrandConfig | None = None, output_path: str | Path | None = None,
-    benefit_report=None,
+    benefit_report=None, investment_report=None,
 ) -> Path:
     """Generate a 2-3 page steering committee pack DOCX."""
     brand = brand or BrandConfig()
@@ -93,6 +98,10 @@ def generate_steering_pack(
     _apply_base_styles(doc, brand)
     _add_header_bar(doc, brand, _h(brand, "steering_title", "Portfolio Risk & Value Briefing — Steering Committee"))
     _maybe_add_logo(doc, brand)
+    # Executive action summary — the lead paragraph
+    from src.insights import generate_executive_summary
+    exec_summary = generate_executive_summary(report, benefit_report, investment_report)
+    _add_exec_action_box(doc, exec_summary, brand)
     _add_section_heading(doc, brand, _h(brand, "exec_summary", "Executive Summary"))
     _add_exec_summary(doc, report, brand)
     _add_portfolio_dashboard(doc, report, brand)
@@ -161,6 +170,37 @@ def generate_project_status_pack(
 # ──────────────────────────────────────────────
 # Layout components
 # ──────────────────────────────────────────────
+
+def _add_exec_action_box(doc: Document, text: str, brand: BrandConfig) -> None:
+    """Visually distinct action summary callout box."""
+    # Determine box colour based on content
+    has_urgent = "urgent" in text.lower() or "emergency" in text.lower()
+    bg = "FEF5E7" if has_urgent else "EBF5FB"
+    border_col = "E67E22" if has_urgent else brand.accent_colour
+
+    table = doc.add_table(rows=1, cols=1)
+    table.alignment = WD_TABLE_ALIGNMENT.LEFT
+    cell = table.rows[0].cells[0]
+    _set_cell_bg(cell, bg)
+    _set_cell_margins(cell, 150, 150, 200, 200)
+
+    # Label
+    p = cell.paragraphs[0]
+    label = p.add_run("⚡ ACTION REQUIRED  " if has_urgent else "📋 PORTFOLIO SUMMARY  ")
+    label.font.size = Pt(8)
+    label.font.bold = True
+    label.font.color.rgb = RGBColor.from_string(border_col)
+
+    # Content
+    p2 = cell.add_paragraph()
+    run = p2.add_run(text)
+    run.font.size = Pt(10)
+    run.font.name = brand.body_font
+    run.font.color.rgb = RGBColor(0x2C, 0x3E, 0x50)
+
+    _set_table_borders(table, border_col)
+    doc.add_paragraph()
+
 
 def _apply_base_styles(doc: Document, brand: BrandConfig) -> None:
     style = doc.styles["Normal"]

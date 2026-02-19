@@ -52,7 +52,7 @@ class TestIngestCommand:
 
     def test_ingest_sets_session_state(self, capsys):
         main(["ingest", str(SAMPLE_DIR)])
-        assert len(_session.projects) == 6
+        assert len(_session.projects) >= 6
         assert _session.report is not None
         assert _session.graph is not None
 

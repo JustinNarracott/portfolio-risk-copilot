@@ -292,7 +292,11 @@ def cmd_brief(args) -> int:
     generated: list[Path] = []
 
     if args.type in ("board", "all"):
-        p = generate_board_briefing(report, brand=brand, output_path=output_dir / "board-briefing.docx")
+        p = generate_board_briefing(
+            report, brand=brand, output_path=output_dir / "board-briefing.docx",
+            benefit_report=_session.benefit_report,
+            investment_report=_session.investment_report,
+        )
         generated.append(p)
         p2 = generate_board_slides(report, brand=brand, output_path=output_dir / "board-briefing.pptx")
         generated.append(p2)
@@ -301,6 +305,7 @@ def cmd_brief(args) -> int:
         p = generate_steering_pack(
             report, brand=brand, output_path=output_dir / "steering-committee-pack.docx",
             benefit_report=_session.benefit_report,
+            investment_report=_session.investment_report,
         )
         generated.append(p)
 
