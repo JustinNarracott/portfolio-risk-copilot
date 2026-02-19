@@ -29,6 +29,7 @@ from src.artefacts.docx_generator import (
     generate_project_status_pack,
 )
 from src.artefacts.pptx_generator import generate_board_slides
+from src.artefacts.dashboard import generate_portfolio_dashboard
 from src.benefits.parser import parse_benefits, Benefit
 from src.benefits.calculator import analyse_benefits, PortfolioBenefitReport
 from src.benefits.artefacts import generate_benefits_report
@@ -92,7 +93,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # pmo-brief
     brief_parser = subparsers.add_parser("brief", help="Generate stakeholder briefing")
-    brief_parser.add_argument("type", choices=["board", "steering", "project", "benefits", "investment", "decisions", "all"], help="Briefing type")
+    brief_parser.add_argument("type", choices=["board", "steering", "project", "benefits", "investment", "decisions", "dashboard", "all"], help="Briefing type")
     brief_parser.add_argument("--logo", type=str, help="Path to logo image (PNG/JPG)")
     brief_parser.add_argument("--colour", type=str, help="Primary brand colour (hex, e.g. 1F4E79)")
     brief_parser.add_argument("--output-dir", type=str, help="Output directory")
@@ -350,6 +351,15 @@ def cmd_brief(args) -> int:
         elif args.type == "investment":
             print("No investment data available. Run 'pmo-copilot ingest' first.")
             return 1
+
+    if args.type in ("dashboard", "all"):
+        p = generate_portfolio_dashboard(
+            report, benefit_report=_session.benefit_report,
+            investment_report=_session.investment_report,
+            projects=_session.projects, brand=brand,
+            output_path=output_dir / "portfolio-dashboard.docx",
+        )
+        generated.append(p)
 
     if args.type in ("decisions", "all"):
         if _session.decision_log.decisions:
