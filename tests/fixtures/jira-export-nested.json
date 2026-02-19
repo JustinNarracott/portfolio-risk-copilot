@@ -1,0 +1,496 @@
+{
+  "projects": [
+    {
+      "name": "Alpha",
+      "project_status": "In Progress",
+      "start_date": "2026-01-06",
+      "end_date": "2026-06-30",
+      "budget": "100000",
+      "actual_spend": "45000",
+      "tasks": [
+        {
+          "task_name": "Design system architecture",
+          "task_status": "Done",
+          "priority": "High",
+          "assignee": "Alice Chen",
+          "sprint": "Sprint 3",
+          "previous_sprints": "",
+          "comments": "Completed ahead of schedule"
+        },
+        {
+          "task_name": "Build user authentication API",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Bob Martinez",
+          "sprint": "Sprint 5",
+          "previous_sprints": "",
+          "comments": "Blocked by infrastructure team - no ETA provided"
+        },
+        {
+          "task_name": "Implement payment gateway",
+          "task_status": "Blocked",
+          "priority": "Critical",
+          "assignee": "Charlie Kim",
+          "sprint": "Sprint 5",
+          "previous_sprints": "Sprint 3;Sprint 4",
+          "comments": "Blocked by third-party vendor API changes. Waiting for vendor response since 2026-01-20"
+        },
+        {
+          "task_name": "Frontend dashboard build",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Diana Patel",
+          "sprint": "Sprint 5",
+          "previous_sprints": "",
+          "comments": "Depends on API completion from Bob"
+        },
+        {
+          "task_name": "Write integration tests",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Eve Johnson",
+          "sprint": "Sprint 5",
+          "previous_sprints": "",
+          "comments": "Waiting for authentication API and payment gateway to be complete"
+        },
+        {
+          "task_name": "Database migration scripts",
+          "task_status": "Done",
+          "priority": "High",
+          "assignee": "Frank Liu",
+          "sprint": "Sprint 4",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Performance load testing",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Alice Chen",
+          "sprint": "Sprint 5",
+          "previous_sprints": "",
+          "comments": "Prerequisite: all APIs must be deployed to staging"
+        },
+        {
+          "task_name": "Security audit",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Bob Martinez",
+          "sprint": "Sprint 6",
+          "previous_sprints": "",
+          "comments": "Depends on authentication API completion"
+        },
+        {
+          "task_name": "User acceptance testing",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Charlie Kim",
+          "sprint": "Sprint 6",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Documentation update",
+          "task_status": "To Do",
+          "priority": "Low",
+          "assignee": "Diana Patel",
+          "sprint": "Sprint 6",
+          "previous_sprints": "",
+          "comments": ""
+        }
+      ]
+    },
+    {
+      "name": "Beta",
+      "project_status": "Planning",
+      "start_date": "2026-02-01",
+      "end_date": "2026-08-31",
+      "budget": "150000",
+      "actual_spend": "10000",
+      "tasks": [
+        {
+          "task_name": "Requirements gathering",
+          "task_status": "Done",
+          "priority": "High",
+          "assignee": "Grace Wilson",
+          "sprint": "Sprint 2",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Stakeholder interviews",
+          "task_status": "Done",
+          "priority": "High",
+          "assignee": "Henry Obi",
+          "sprint": "Sprint 2",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Design mockups",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Grace Wilson",
+          "sprint": "Sprint 3",
+          "previous_sprints": "",
+          "comments": "Client feedback pending - slow response from sponsor"
+        },
+        {
+          "task_name": "Technical feasibility study",
+          "task_status": "In Progress",
+          "priority": "Medium",
+          "assignee": "Henry Obi",
+          "sprint": "Sprint 3",
+          "previous_sprints": "",
+          "comments": "Waiting for infrastructure team capacity assessment"
+        },
+        {
+          "task_name": "Data model design",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Grace Wilson",
+          "sprint": "Sprint 4",
+          "previous_sprints": "",
+          "comments": "Depends on technical feasibility study"
+        },
+        {
+          "task_name": "API specification",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Henry Obi",
+          "sprint": "Sprint 4",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Vendor selection",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Grace Wilson",
+          "sprint": "Sprint 4",
+          "previous_sprints": "",
+          "comments": "Blocked by procurement process - budget approval pending"
+        },
+        {
+          "task_name": "Environment setup",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Henry Obi",
+          "sprint": "Sprint 5",
+          "previous_sprints": "",
+          "comments": ""
+        }
+      ]
+    },
+    {
+      "name": "Gamma",
+      "project_status": "At Risk",
+      "start_date": "2025-09-01",
+      "end_date": "2026-04-30",
+      "budget": "200000",
+      "actual_spend": "185000",
+      "tasks": [
+        {
+          "task_name": "Core platform migration",
+          "task_status": "In Progress",
+          "priority": "Critical",
+          "assignee": "Ivan Torres",
+          "sprint": "Sprint 8",
+          "previous_sprints": "Sprint 4;Sprint 5;Sprint 6;Sprint 7",
+          "comments": "Repeatedly delayed due to legacy system complexity. Original estimate was Sprint 5 completion"
+        },
+        {
+          "task_name": "Data migration pipeline",
+          "task_status": "In Progress",
+          "priority": "Critical",
+          "assignee": "Julia Park",
+          "sprint": "Sprint 8",
+          "previous_sprints": "Sprint 6;Sprint 7",
+          "comments": "Blocked by core platform migration. Cannot proceed until platform is stable"
+        },
+        {
+          "task_name": "User training material",
+          "task_status": "On Hold",
+          "priority": "Medium",
+          "assignee": "Karen Wright",
+          "sprint": "Sprint 8",
+          "previous_sprints": "",
+          "comments": "On hold until migration is complete"
+        },
+        {
+          "task_name": "Legacy system decommission",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Ivan Torres",
+          "sprint": "Sprint 9",
+          "previous_sprints": "",
+          "comments": "Depends on successful data migration validation"
+        },
+        {
+          "task_name": "Rollback plan documentation",
+          "task_status": "Done",
+          "priority": "High",
+          "assignee": "Julia Park",
+          "sprint": "Sprint 7",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Performance benchmarking",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Karen Wright",
+          "sprint": "Sprint 9",
+          "previous_sprints": "",
+          "comments": "Prerequisite: core platform migration complete"
+        },
+        {
+          "task_name": "Compliance verification",
+          "task_status": "To Do",
+          "priority": "Critical",
+          "assignee": "Ivan Torres",
+          "sprint": "Sprint 9",
+          "previous_sprints": "",
+          "comments": "Waiting for legal team review"
+        },
+        {
+          "task_name": "Go-live checklist",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Julia Park",
+          "sprint": "Sprint 10",
+          "previous_sprints": "",
+          "comments": ""
+        }
+      ]
+    },
+    {
+      "name": "Delta",
+      "project_status": "In Progress",
+      "start_date": "2026-01-15",
+      "end_date": "2026-07-31",
+      "budget": "80000",
+      "actual_spend": "22000",
+      "tasks": [
+        {
+          "task_name": "Mobile app wireframes",
+          "task_status": "Done",
+          "priority": "High",
+          "assignee": "Leo Nakamura",
+          "sprint": "Sprint 3",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "iOS prototype build",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Mia Santos",
+          "sprint": "Sprint 5",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Android prototype build",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Leo Nakamura",
+          "sprint": "Sprint 5",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Backend API development",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Mia Santos",
+          "sprint": "Sprint 5",
+          "previous_sprints": "Sprint 4",
+          "comments": "Some carry-over from Sprint 4 due to scope creep"
+        },
+        {
+          "task_name": "Push notification service",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Leo Nakamura",
+          "sprint": "Sprint 6",
+          "previous_sprints": "",
+          "comments": "Depends on backend API"
+        },
+        {
+          "task_name": "User analytics integration",
+          "task_status": "To Do",
+          "priority": "Low",
+          "assignee": "Mia Santos",
+          "sprint": "Sprint 6",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Beta testing programme",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Leo Nakamura",
+          "sprint": "Sprint 7",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "App store submission prep",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Mia Santos",
+          "sprint": "Sprint 8",
+          "previous_sprints": "",
+          "comments": ""
+        }
+      ]
+    },
+    {
+      "name": "Epsilon",
+      "project_status": "In Progress",
+      "start_date": "2025-11-01",
+      "end_date": "2026-03-31",
+      "budget": "60000",
+      "actual_spend": "58000",
+      "tasks": [
+        {
+          "task_name": "Regulatory compliance audit",
+          "task_status": "In Progress",
+          "priority": "Critical",
+          "assignee": "Nora Bell",
+          "sprint": "Sprint 6",
+          "previous_sprints": "Sprint 4;Sprint 5",
+          "comments": "Repeatedly extended. Auditor flagged 12 additional items in Sprint 5"
+        },
+        {
+          "task_name": "Policy document updates",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Oscar Ruiz",
+          "sprint": "Sprint 6",
+          "previous_sprints": "Sprint 5",
+          "comments": "Waiting for compliance audit findings to finalise"
+        },
+        {
+          "task_name": "Staff training rollout",
+          "task_status": "On Hold",
+          "priority": "High",
+          "assignee": "Nora Bell",
+          "sprint": "Sprint 6",
+          "previous_sprints": "",
+          "comments": "On hold - blocked by policy document completion"
+        },
+        {
+          "task_name": "System controls implementation",
+          "task_status": "In Progress",
+          "priority": "Critical",
+          "assignee": "Oscar Ruiz",
+          "sprint": "Sprint 6",
+          "previous_sprints": "",
+          "comments": "Depends on audit recommendations"
+        },
+        {
+          "task_name": "External audit scheduling",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Nora Bell",
+          "sprint": "Sprint 7",
+          "previous_sprints": "",
+          "comments": "Cannot schedule until internal audit complete"
+        },
+        {
+          "task_name": "Board compliance report",
+          "task_status": "To Do",
+          "priority": "Critical",
+          "assignee": "Oscar Ruiz",
+          "sprint": "Sprint 7",
+          "previous_sprints": "",
+          "comments": "Waiting for all audit streams to complete"
+        }
+      ]
+    },
+    {
+      "name": "Zeta",
+      "project_status": "In Progress",
+      "start_date": "2026-01-20",
+      "end_date": "2026-09-30",
+      "budget": "120000",
+      "actual_spend": "15000",
+      "tasks": [
+        {
+          "task_name": "Market research phase",
+          "task_status": "Done",
+          "priority": "High",
+          "assignee": "Priya Sharma",
+          "sprint": "Sprint 2",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Competitive analysis",
+          "task_status": "Done",
+          "priority": "Medium",
+          "assignee": "Quinn Foster",
+          "sprint": "Sprint 2",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Product strategy document",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Priya Sharma",
+          "sprint": "Sprint 3",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "MVP feature prioritisation",
+          "task_status": "In Progress",
+          "priority": "High",
+          "assignee": "Quinn Foster",
+          "sprint": "Sprint 3",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "UX research interviews",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Priya Sharma",
+          "sprint": "Sprint 4",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "Technical architecture design",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Quinn Foster",
+          "sprint": "Sprint 4",
+          "previous_sprints": "",
+          "comments": "Depends on product strategy finalisation"
+        },
+        {
+          "task_name": "Prototype build",
+          "task_status": "To Do",
+          "priority": "High",
+          "assignee": "Priya Sharma",
+          "sprint": "Sprint 5",
+          "previous_sprints": "",
+          "comments": ""
+        },
+        {
+          "task_name": "User testing round 1",
+          "task_status": "To Do",
+          "priority": "Medium",
+          "assignee": "Quinn Foster",
+          "sprint": "Sprint 6",
+          "previous_sprints": "",
+          "comments": ""
+        }
+      ]
+    }
+  ]
+}

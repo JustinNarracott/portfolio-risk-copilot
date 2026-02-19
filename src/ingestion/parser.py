@@ -231,33 +231,189 @@ def _parse_csv(filepath: Path) -> list[Project]:
 
 
 def _parse_json(filepath: Path) -> list[Project]:
-    """Parse a JSON export file.
+    """Parse a JSON export file into Project objects.
 
-    Expects either:
-    - A list of row objects (same structure as CSV rows)
-    - A dict with a 'tasks' or 'issues' key containing a list of row objects
+    Accepts three structures:
+    1. A list of row objects (same keys as CSV headers).
+    2. A dict with a 'tasks', 'issues', or 'items' key containing a list of row objects.
+    3. A dict with a 'projects' key containing a list of project objects,
+       each with a 'tasks' list nested inside.
 
     Args:
         filepath: Path to the JSON file.
 
     Returns:
         List of Project objects sorted by name.
+
+    Raises:
+        ValueError: If JSON structure is unrecognised or required columns are missing.
     """
-    # TODO: Implement in Issue #3
-    raise NotImplementedError("JSON parser not yet implemented — see Issue #3")
+    with open(filepath, encoding="utf-8-sig") as f:
+        data = json.load(f)
+
+    # Determine structure and extract flat row list
+    rows: list[dict[str, Any]]
+
+    if isinstance(data, list):
+        # Structure 1: flat list of row objects
+        rows = data
+    elif isinstance(data, dict):
+        # Structure 2: dict with a known key containing row list
+        for key in ("tasks", "issues", "items", "rows", "data"):
+            if key in data and isinstance(data[key], list):
+                rows = data[key]
+                break
+        else:
+            # Structure 3: dict with 'projects' key containing nested tasks
+            if "projects" in data and isinstance(data["projects"], list):
+                rows = _flatten_nested_projects(data["projects"])
+            else:
+                raise ValueError(
+                    f"Unrecognised JSON structure. Expected a list of rows, "
+                    f"or a dict with 'tasks'/'issues'/'items'/'projects' key. "
+                    f"Found keys: {', '.join(data.keys())}"
+                )
+    else:
+        raise ValueError(f"Unrecognised JSON structure. Expected list or dict, got {type(data).__name__}")
+
+    if not rows:
+        return []
+
+    # Stringify all values (JSON may have ints, floats, nulls)
+    str_rows = [_stringify_row(row) for row in rows]
+
+    # Build column map from the keys of the first row
+    headers = list(str_rows[0].keys()) if str_rows else []
+    col_map = _build_column_map(headers)
+
+    # Check required fields
+    mapped_fields = set(col_map.values())
+    missing = REQUIRED_FIELDS - mapped_fields
+    if missing:
+        raise ValueError(
+            f"Missing required columns: {', '.join(sorted(missing))}. "
+            f"Found keys: {', '.join(headers)}"
+        )
+
+    return _rows_to_projects(str_rows, col_map)
+
+
+def _flatten_nested_projects(projects: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Flatten nested project structure into flat rows.
+
+    Converts:
+        [{"name": "Alpha", "status": "Active", "tasks": [{"name": "Build API", ...}]}]
+    Into:
+        [{"project": "Alpha", "project_status": "Active", "task_name": "Build API", ...}]
+    """
+    rows: list[dict[str, Any]] = []
+    for proj in projects:
+        project_fields = {k: v for k, v in proj.items() if k != "tasks"}
+        tasks = proj.get("tasks", [])
+        if not tasks:
+            continue
+        for task in tasks:
+            row = {**project_fields, **task}
+            # Ensure project name is available under a standard key
+            if "project" not in row and "name" in project_fields:
+                row["project"] = project_fields["name"]
+            rows.append(row)
+    return rows
+
+
+def _stringify_row(row: dict[str, Any]) -> dict[str, str]:
+    """Convert all values in a row dict to strings for consistent processing.
+
+    Handles None, int, float, list, and other types gracefully.
+    """
+    result: dict[str, str] = {}
+    for key, value in row.items():
+        if value is None:
+            result[key] = ""
+        elif isinstance(value, list):
+            result[key] = ";".join(str(v) for v in value)
+        else:
+            result[key] = str(value)
+    return result
 
 
 def _parse_xlsx(filepath: Path) -> list[Project]:
-    """Parse an Excel export file.
+    """Parse an Excel export file into Project objects.
+
+    Reads the first sheet. Uses the first row as headers.
 
     Args:
-        filepath: Path to the XLSX file.
+        filepath: Path to the XLSX/XLS file.
 
     Returns:
         List of Project objects sorted by name.
+
+    Raises:
+        ValueError: If required columns are missing or sheet is empty.
     """
-    # TODO: Implement in Issue #3
-    raise NotImplementedError("Excel parser not yet implemented — see Issue #3")
+    try:
+        import openpyxl
+    except ImportError:
+        raise ImportError(
+            "openpyxl is required to parse Excel files. "
+            "Install it with: pip install openpyxl"
+        )
+
+    wb = openpyxl.load_workbook(filepath, read_only=True, data_only=True)
+    ws = wb.active
+
+    if ws is None:
+        wb.close()
+        raise ValueError(f"Excel file has no active sheet: {filepath}")
+
+    # Read all rows
+    all_rows = list(ws.iter_rows(values_only=True))
+    wb.close()
+
+    if not all_rows or len(all_rows) < 1:
+        raise ValueError(f"Excel file is empty: {filepath}")
+
+    # First row is headers
+    raw_headers = all_rows[0]
+    headers = [str(h).strip() if h is not None else "" for h in raw_headers]
+
+    if not any(headers):
+        raise ValueError(f"Excel file has no header row: {filepath}")
+
+    # Build column map
+    col_map = _build_column_map(headers)
+
+    # Check required fields
+    mapped_fields = set(col_map.values())
+    missing = REQUIRED_FIELDS - mapped_fields
+    if missing:
+        wb_close_msg = f"Found columns: {', '.join(h for h in headers if h)}"
+        raise ValueError(
+            f"Missing required columns: {', '.join(sorted(missing))}. {wb_close_msg}"
+        )
+
+    # Convert data rows to list of dicts (same format as CSV DictReader output)
+    str_rows: list[dict[str, str]] = []
+    for row_tuple in all_rows[1:]:
+        row_dict: dict[str, str] = {}
+        for i, value in enumerate(row_tuple):
+            if i < len(headers) and headers[i]:
+                if value is None:
+                    row_dict[headers[i]] = ""
+                elif isinstance(value, (int, float)):
+                    # Preserve numeric precision, avoid trailing .0 for integers
+                    row_dict[headers[i]] = str(int(value)) if isinstance(value, float) and value == int(value) else str(value)
+                elif hasattr(value, "strftime"):
+                    # Handle datetime/date objects from Excel
+                    row_dict[headers[i]] = value.strftime("%Y-%m-%d")
+                else:
+                    row_dict[headers[i]] = str(value)
+        str_rows.append(row_dict)
+
+    if not str_rows:
+        return []
+
+    return _rows_to_projects(str_rows, col_map)
 
 
 # ──────────────────────────────────────────────

@@ -48,19 +48,25 @@ class TestParseFileDispatcher:
         with pytest.raises(ValueError, match="Unsupported file format"):
             parse_file(bad_file)
 
-    def test_json_not_implemented(self, tmp_path):
-        """JSON parser raises NotImplementedError (deferred to Issue #3)."""
+    def test_json_parses_successfully(self, tmp_path):
+        """JSON parser works via parse_file dispatcher."""
         json_file = tmp_path / "data.json"
-        json_file.write_text("[]")
-        with pytest.raises(NotImplementedError):
-            parse_file(json_file)
+        json_file.write_text('[{"Project": "A", "Task Name": "T1", "Task Status": "Done"}]')
+        projects = parse_file(json_file)
+        assert len(projects) == 1
 
-    def test_xlsx_not_implemented(self, tmp_path):
-        """XLSX parser raises NotImplementedError (deferred to Issue #3)."""
+    def test_xlsx_parses_successfully(self, tmp_path):
+        """XLSX parser works via parse_file dispatcher."""
+        import openpyxl
         xlsx_file = tmp_path / "data.xlsx"
-        xlsx_file.write_bytes(b"fake xlsx")
-        with pytest.raises(NotImplementedError):
-            parse_file(xlsx_file)
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.append(["Project", "Task Name", "Task Status"])
+        ws.append(["A", "T1", "Done"])
+        wb.save(xlsx_file)
+        wb.close()
+        projects = parse_file(xlsx_file)
+        assert len(projects) == 1
 
 
 # ──────────────────────────────────────────────
