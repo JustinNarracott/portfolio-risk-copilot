@@ -32,6 +32,8 @@ from src.artefacts.pptx_generator import generate_board_slides
 from src.benefits.parser import parse_benefits, Benefit
 from src.benefits.calculator import analyse_benefits, PortfolioBenefitReport
 from src.benefits.artefacts import generate_benefits_report
+from src.investment import analyse_investments, PortfolioInvestmentReport
+from src.investment.artefacts import generate_investment_report
 
 __version__ = "1.1.0"
 
@@ -43,6 +45,7 @@ class Session:
         self.projects: list[Project] = []
         self.report: PortfolioRiskReport | None = None
         self.benefit_report: PortfolioBenefitReport | None = None
+        self.investment_report: PortfolioInvestmentReport | None = None
         self.benefits: list[Benefit] = []
         self.graph: DependencyGraph | None = None
         self.brand: BrandConfig = BrandConfig()
@@ -84,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # pmo-brief
     brief_parser = subparsers.add_parser("brief", help="Generate stakeholder briefing")
-    brief_parser.add_argument("type", choices=["board", "steering", "project", "benefits", "all"], help="Briefing type")
+    brief_parser.add_argument("type", choices=["board", "steering", "project", "benefits", "investment", "all"], help="Briefing type")
     brief_parser.add_argument("--logo", type=str, help="Path to logo image (PNG/JPG)")
     brief_parser.add_argument("--colour", type=str, help="Primary brand colour (hex, e.g. 1F4E79)")
     brief_parser.add_argument("--output-dir", type=str, help="Output directory")
@@ -191,6 +194,11 @@ def cmd_ingest(args) -> int:
         _session.benefit_report = analyse_benefits(
             _session.benefits, _session.report, _session.reference_date
         )
+
+    # Run investment analysis
+    _session.investment_report = analyse_investments(
+        deduplicated, _session.report, _session.benefit_report
+    )
 
     if hasattr(args, "output_dir") and args.output_dir:
         _session.output_dir = Path(args.output_dir)
@@ -309,6 +317,17 @@ def cmd_brief(args) -> int:
             generated.append(p)
         elif args.type == "benefits":
             print("No benefit data loaded. Ensure benefit tracker CSV is in the ingested folder.")
+            return 1
+
+    if args.type in ("investment", "all"):
+        if _session.investment_report:
+            p = generate_investment_report(
+                _session.investment_report, brand=brand,
+                output_path=output_dir / "investment-summary.docx",
+            )
+            generated.append(p)
+        elif args.type == "investment":
+            print("No investment data available. Run 'pmo-copilot ingest' first.")
             return 1
 
     print(f"✓ Generated {len(generated)} artefact(s):")
