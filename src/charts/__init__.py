@@ -108,7 +108,7 @@ def chart_rag_donut(report: PortfolioRiskReport) -> Path:
     # Centre text
     total = sum(sizes)
     ax.text(0, 0.08, str(total), ha="center", va="center", fontsize=28, fontweight="bold", color=COLOURS["primary"])
-    ax.text(0, -0.15, "PROJECTS", ha="center", va="center", fontsize=7, fontweight="bold", color=COLOURS["dark_grey"], letter_spacing=0.15)
+    ax.text(0, -0.15, "PROJECTS", ha="center", va="center", fontsize=7, fontweight="bold", color=COLOURS["dark_grey"])
 
     # Legend
     legend_patches = [mpatches.Patch(color=RAG_COLOURS[k], label=f"{k} ({counts[k]})") for k in ["Red", "Amber", "Green"] if counts[k] > 0]
@@ -123,13 +123,29 @@ def chart_rag_donut(report: PortfolioRiskReport) -> Path:
 # 2. Budget vs Spend Bar Chart
 # ──────────────────────────────────────────────
 
-def chart_budget_vs_spend(report: PortfolioRiskReport) -> Path:
+def chart_budget_vs_spend(report: PortfolioRiskReport, projects: list | None = None) -> Path:
     """Horizontal bar chart: budget vs actual spend per project."""
-    summaries = sorted(report.project_summaries, key=lambda s: -(s.budget or 0))[:12]  # Top 12
+    from src.ingestion.parser import Project
+
+    # Build budget/spend lookup from projects
+    budget_map: dict[str, tuple[float, float]] = {}
+    if projects:
+        for p in projects:
+            if p.name not in budget_map:
+                budget_map[p.name] = (p.budget or 0, p.actual_spend or 0)
+
+    summaries = sorted(report.project_summaries, key=lambda s: -budget_map.get(s.project_name, (0, 0))[0])
+    summaries = [s for s in summaries if budget_map.get(s.project_name, (0, 0))[0] > 0][:12]
+
+    if not summaries:
+        fig, ax = plt.subplots(figsize=(5, 2))
+        ax.text(0.5, 0.5, "No budget data available", ha="center", va="center", fontsize=10, color=COLOURS["dark_grey"])
+        ax.set_axis_off()
+        return _save(fig, "budget_vs_spend")
 
     names = [s.project_name[:20] for s in summaries]
-    budgets = [s.budget or 0 for s in summaries]
-    spends = [s.actual_spend or 0 for s in summaries]
+    budgets = [budget_map.get(s.project_name, (0, 0))[0] for s in summaries]
+    spends = [budget_map.get(s.project_name, (0, 0))[1] for s in summaries]
 
     y = np.arange(len(names))
     h = 0.35
@@ -165,7 +181,7 @@ def chart_budget_vs_spend(report: PortfolioRiskReport) -> Path:
 
 def chart_risk_heatmap(report: PortfolioRiskReport) -> Path:
     """Risk heatmap: severity × category matrix."""
-    categories = [RiskCategory.BLOCKED_WORK, RiskCategory.BURN_RATE, RiskCategory.CARRY_OVER, RiskCategory.DEPENDENCY]
+    categories = [RiskCategory.BLOCKED_WORK, RiskCategory.BURN_RATE, RiskCategory.CHRONIC_CARRYOVER, RiskCategory.DEPENDENCY]
     severities = [RiskSeverity.CRITICAL, RiskSeverity.HIGH, RiskSeverity.MEDIUM, RiskSeverity.LOW]
     cat_labels = ["Blocked\nWork", "Burn\nRate", "Carry-\nOver", "Depend-\nency"]
     sev_labels = ["Critical", "High", "Medium", "Low"]
@@ -204,35 +220,48 @@ def chart_risk_heatmap(report: PortfolioRiskReport) -> Path:
 # 4. Timeline Chart (Gantt-style)
 # ──────────────────────────────────────────────
 
-def chart_timeline(report: PortfolioRiskReport) -> Path:
+def chart_timeline(report: PortfolioRiskReport, projects: list | None = None) -> Path:
     """Horizontal bar timeline showing project durations coloured by RAG."""
     from datetime import date
-    summaries = [s for s in report.project_summaries if s.start_date and s.end_date]
-    summaries = sorted(summaries, key=lambda s: s.start_date)[:15]
+    from src.ingestion.parser import Project
 
-    if not summaries:
+    # Build date lookup from projects
+    date_map: dict[str, tuple[date | None, date | None]] = {}
+    if projects:
+        for p in projects:
+            if p.name not in date_map and p.start_date and p.end_date:
+                date_map[p.name] = (p.start_date, p.end_date)
+
+    entries = []
+    for s in report.project_summaries:
+        dates = date_map.get(s.project_name)
+        if dates and dates[0] and dates[1]:
+            entries.append((s, dates[0], dates[1]))
+    entries = sorted(entries, key=lambda e: e[1])[:15]
+
+    if not entries:
         # Fallback: empty chart
         fig, ax = plt.subplots(figsize=(6, 2))
         ax.text(0.5, 0.5, "No timeline data available", ha="center", va="center", fontsize=10)
         ax.set_axis_off()
         return _save(fig, "timeline")
 
-    fig, ax = plt.subplots(figsize=(7, max(3, len(summaries) * 0.4)))
+    fig, ax = plt.subplots(figsize=(7, max(3, len(entries) * 0.4)))
     today = date.today()
 
-    for i, s in enumerate(summaries):
-        start = s.start_date.toordinal()
-        end = s.end_date.toordinal()
-        duration = max(1, end - start)
+    for i, (s, start, end) in enumerate(entries):
+        s_ord = start.toordinal()
+        e_ord = end.toordinal()
+        duration = max(1, e_ord - s_ord)
         colour = RAG_COLOURS.get(s.rag_status, COLOURS["grey"])
-        ax.barh(i, duration, left=start, height=0.6, color=colour, alpha=0.85, edgecolor="white", linewidth=0.5)
+        ax.barh(i, duration, left=s_ord, height=0.6, color=colour, alpha=0.85, edgecolor="white", linewidth=0.5)
 
     # Today line
     ax.axvline(x=today.toordinal(), color=COLOURS["primary"], linestyle="--", linewidth=1, alpha=0.7)
-    ax.text(today.toordinal(), len(summaries) + 0.3, "Today", fontsize=7, ha="center", color=COLOURS["primary"])
+    ax.text(today.toordinal(), len(entries) + 0.3, "Today", fontsize=7, ha="center", color=COLOURS["primary"])
 
-    ax.set_yticks(range(len(summaries)))
-    ax.set_yticklabels([s.project_name[:22] for s in summaries], fontsize=7)
+    ax.set_yticks(range(len(entries)))
+    ax.set_yticklabels([e[0].project_name[:22] for e in entries], fontsize=7)
     ax.invert_yaxis()
     _style_ax(ax)
 
@@ -384,10 +413,18 @@ def chart_roi_vs_risk(investment_report: PortfolioInvestmentReport) -> Path:
 # 8. Budget Allocation Treemap (simplified as pie)
 # ──────────────────────────────────────────────
 
-def chart_budget_allocation(report: PortfolioRiskReport) -> Path:
+def chart_budget_allocation(report: PortfolioRiskReport, projects: list | None = None) -> Path:
     """Pie chart showing budget allocation across projects."""
-    summaries = [s for s in report.project_summaries if (s.budget or 0) > 0]
-    summaries = sorted(summaries, key=lambda s: -(s.budget or 0))
+    # Build budget lookup
+    budget_map: dict[str, float] = {}
+    if projects:
+        for p in projects:
+            if p.name not in budget_map:
+                budget_map[p.name] = p.budget or 0
+
+    summaries = [(s, budget_map.get(s.project_name, 0)) for s in report.project_summaries]
+    summaries = [(s, b) for s, b in summaries if b > 0]
+    summaries = sorted(summaries, key=lambda x: -x[1])
 
     if not summaries:
         fig, ax = plt.subplots(figsize=(4, 3))
@@ -397,15 +434,15 @@ def chart_budget_allocation(report: PortfolioRiskReport) -> Path:
 
     # Top 8, bundle rest
     top = summaries[:8]
-    rest_budget = sum(s.budget or 0 for s in summaries[8:])
-    names = [s.project_name.split(" - ")[0][:15] if " - " in s.project_name else s.project_name[:15] for s in top]
-    values = [s.budget or 0 for s in top]
+    rest_budget = sum(b for _, b in summaries[8:])
+    names = [s.project_name.split(" - ")[0][:15] if " - " in s.project_name else s.project_name[:15] for s, _ in top]
+    values = [b for _, b in top]
     if rest_budget > 0:
         names.append("Other")
         values.append(rest_budget)
 
     # Colour by RAG
-    colors = [RAG_COLOURS.get(s.rag_status, COLOURS["grey"]) for s in top]
+    colors = [RAG_COLOURS.get(s.rag_status, COLOURS["grey"]) for s, _ in top]
     if rest_budget > 0:
         colors.append(COLOURS["grey"])
 
@@ -433,8 +470,16 @@ def chart_portfolio_dashboard(
     risk_report: PortfolioRiskReport,
     benefit_report: PortfolioBenefitReport | None = None,
     investment_report: PortfolioInvestmentReport | None = None,
+    projects: list | None = None,
 ) -> Path:
     """Composite 2×2 dashboard: RAG donut, budget chart, risk heatmap, timeline."""
+    # Build budget lookup
+    budget_map: dict[str, tuple[float, float]] = {}
+    if projects:
+        for p in projects:
+            if p.name not in budget_map:
+                budget_map[p.name] = (p.budget or 0, p.actual_spend or 0)
+
     fig = plt.figure(figsize=(11, 7.5))
     gs = GridSpec(2, 2, figure=fig, hspace=0.35, wspace=0.3)
 
@@ -459,30 +504,35 @@ def chart_portfolio_dashboard(
 
     # 2. Budget vs Spend (top-right)
     ax2 = fig.add_subplot(gs[0, 1])
-    summaries = sorted(risk_report.project_summaries, key=lambda s: -(s.budget or 0))[:10]
-    names = [s.project_name.split(" - ")[0][:14] if " - " in s.project_name else s.project_name[:14] for s in summaries]
-    budgets = [s.budget or 0 for s in summaries]
-    spends = [s.actual_spend or 0 for s in summaries]
-    y = np.arange(len(names))
-    h = 0.35
-    ax2.barh(y + h/2, budgets, h, label="Budget", color=COLOURS["accent"], alpha=0.3, edgecolor=COLOURS["accent"])
-    spend_bars = ax2.barh(y - h/2, spends, h, label="Spent", color=COLOURS["accent"], edgecolor=COLOURS["accent"])
-    for i, (b, s) in enumerate(zip(budgets, spends)):
-        if b > 0 and s / b > 0.85:
-            spend_bars[i].set_color(COLOURS["red"])
-            spend_bars[i].set_edgecolor(COLOURS["red"])
-    ax2.set_yticks(y)
-    ax2.set_yticklabels(names, fontsize=7)
-    ax2.invert_yaxis()
-    ax2.legend(fontsize=7, frameon=False, loc="lower right")
-    ax2.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"£{x/1000:.0f}k"))
+    summaries_b = sorted(risk_report.project_summaries, key=lambda s: -budget_map.get(s.project_name, (0, 0))[0])
+    summaries_b = [s for s in summaries_b if budget_map.get(s.project_name, (0, 0))[0] > 0][:10]
+    if summaries_b:
+        names = [s.project_name.split(" - ")[0][:14] if " - " in s.project_name else s.project_name[:14] for s in summaries_b]
+        budgets = [budget_map.get(s.project_name, (0, 0))[0] for s in summaries_b]
+        spends = [budget_map.get(s.project_name, (0, 0))[1] for s in summaries_b]
+        y = np.arange(len(names))
+        h = 0.35
+        ax2.barh(y + h/2, budgets, h, label="Budget", color=COLOURS["accent"], alpha=0.3, edgecolor=COLOURS["accent"])
+        spend_bars = ax2.barh(y - h/2, spends, h, label="Spent", color=COLOURS["accent"], edgecolor=COLOURS["accent"])
+        for i, (b, s) in enumerate(zip(budgets, spends)):
+            if b > 0 and s / b > 0.85:
+                spend_bars[i].set_color(COLOURS["red"])
+                spend_bars[i].set_edgecolor(COLOURS["red"])
+        ax2.set_yticks(y)
+        ax2.set_yticklabels(names, fontsize=7)
+        ax2.invert_yaxis()
+        ax2.legend(fontsize=7, frameon=False, loc="lower right")
+        ax2.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"£{x/1000:.0f}k"))
+    else:
+        ax2.text(0.5, 0.5, "No budget data", ha="center", va="center", fontsize=9, color=COLOURS["dark_grey"])
+        ax2.set_axis_off()
     _style_ax(ax2)
     ax2.tick_params(labelsize=7)
     ax2.set_title("Budget vs Spend", fontsize=10, fontweight="bold", color=COLOURS["primary"], pad=8)
 
     # 3. Risk Heatmap (bottom-left)
     ax3 = fig.add_subplot(gs[1, 0])
-    categories = [RiskCategory.BLOCKED_WORK, RiskCategory.BURN_RATE, RiskCategory.CARRY_OVER, RiskCategory.DEPENDENCY]
+    categories = [RiskCategory.BLOCKED_WORK, RiskCategory.BURN_RATE, RiskCategory.CHRONIC_CARRYOVER, RiskCategory.DEPENDENCY]
     severities = [RiskSeverity.CRITICAL, RiskSeverity.HIGH, RiskSeverity.MEDIUM, RiskSeverity.LOW]
     matrix = np.zeros((len(severities), len(categories)))
     for s in risk_report.project_summaries:
@@ -523,17 +573,25 @@ def chart_portfolio_dashboard(
         ax4.tick_params(labelsize=7)
         ax4.set_title("Benefits Drift", fontsize=10, fontweight="bold", color=COLOURS["primary"], pad=8)
     else:
-        # Timeline fallback
-        tl = [s for s in risk_report.project_summaries if s.start_date and s.end_date]
-        tl = sorted(tl, key=lambda s: s.start_date)[:10]
-        if tl:
-            from datetime import date as dt_date
-            for i, s in enumerate(tl):
-                start = s.start_date.toordinal()
-                end = s.end_date.toordinal()
-                ax4.barh(i, max(1, end - start), left=start, height=0.5, color=RAG_COLOURS.get(s.rag_status, COLOURS["grey"]), edgecolor="white")
-            ax4.set_yticks(range(len(tl)))
-            ax4.set_yticklabels([s.project_name[:14] for s in tl], fontsize=6)
+        # Timeline fallback using projects
+        from datetime import date as dt_date
+        date_map: dict[str, tuple] = {}
+        if projects:
+            for p in projects:
+                if p.name not in date_map and p.start_date and p.end_date:
+                    date_map[p.name] = (p.start_date, p.end_date)
+        tl_entries = []
+        for s in risk_report.project_summaries:
+            dates = date_map.get(s.project_name)
+            if dates:
+                tl_entries.append((s, dates[0], dates[1]))
+        tl_entries = sorted(tl_entries, key=lambda e: e[1])[:10]
+        if tl_entries:
+            for i, (s, start, end) in enumerate(tl_entries):
+                ax4.barh(i, max(1, end.toordinal() - start.toordinal()), left=start.toordinal(),
+                         height=0.5, color=RAG_COLOURS.get(s.rag_status, COLOURS["grey"]), edgecolor="white")
+            ax4.set_yticks(range(len(tl_entries)))
+            ax4.set_yticklabels([e[0].project_name[:14] for e in tl_entries], fontsize=6)
             ax4.invert_yaxis()
             ax4.xaxis_date()
             from matplotlib.dates import MonthLocator, DateFormatter

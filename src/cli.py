@@ -310,6 +310,7 @@ def cmd_brief(args) -> int:
             report, brand=brand, output_path=output_dir / "board-briefing.docx",
             benefit_report=_session.benefit_report,
             investment_report=_session.investment_report,
+            projects=_session.projects,
         )
         generated.append(p)
         p2 = generate_board_slides(report, brand=brand, output_path=output_dir / "board-briefing.pptx")
@@ -320,6 +321,7 @@ def cmd_brief(args) -> int:
             report, brand=brand, output_path=output_dir / "steering-committee-pack.docx",
             benefit_report=_session.benefit_report,
             investment_report=_session.investment_report,
+            projects=_session.projects,
         )
         generated.append(p)
 

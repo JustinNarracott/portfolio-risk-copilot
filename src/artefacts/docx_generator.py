@@ -61,7 +61,7 @@ SEVERITY_BADGES = {
 
 def generate_board_briefing(
     report: PortfolioRiskReport, brand: BrandConfig | None = None, output_path: str | Path | None = None,
-    benefit_report=None, investment_report=None,
+    benefit_report=None, investment_report=None, projects=None,
 ) -> Path:
     """Generate a 1-page board briefing DOCX."""
     brand = brand or BrandConfig()
@@ -76,7 +76,7 @@ def generate_board_briefing(
     # Portfolio dashboard chart
     try:
         from src.charts import chart_portfolio_dashboard
-        chart_path = chart_portfolio_dashboard(report, benefit_report, investment_report)
+        chart_path = chart_portfolio_dashboard(report, benefit_report, investment_report, projects=projects)
         doc.add_picture(str(chart_path), width=Inches(6.5))
         last_para = doc.paragraphs[-1]
         last_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -100,7 +100,7 @@ def generate_board_briefing(
 
 def generate_steering_pack(
     report: PortfolioRiskReport, brand: BrandConfig | None = None, output_path: str | Path | None = None,
-    benefit_report=None, investment_report=None,
+    benefit_report=None, investment_report=None, projects=None,
 ) -> Path:
     """Generate a 2-3 page steering committee pack DOCX."""
     brand = brand or BrandConfig()
@@ -119,7 +119,7 @@ def generate_steering_pack(
         from src.charts import chart_rag_donut, chart_budget_vs_spend
         from docx.shared import Inches as _Inches
         chart1 = chart_rag_donut(report)
-        chart2 = chart_budget_vs_spend(report)
+        chart2 = chart_budget_vs_spend(report, projects=projects)
         # Side-by-side via table
         ct = doc.add_table(rows=1, cols=2)
         ct.alignment = WD_TABLE_ALIGNMENT.LEFT
