@@ -1,5 +1,5 @@
 {
-  "name": "Portfolio Risk Copilot",
+  "name": "portfolio-risk-copilot",
   "description": "Turn messy project data into exec-ready briefings, portfolio risk analysis, and what-if scenarios. Ingest exports from Jira, Azure DevOps, or Smartsheet and generate board packs, steering committee reports, and investment summaries — all from your local files.",
   "version": "1.2.0",
   "author": {
