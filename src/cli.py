@@ -34,6 +34,10 @@ from src.benefits.calculator import analyse_benefits, PortfolioBenefitReport
 from src.benefits.artefacts import generate_benefits_report
 from src.investment import analyse_investments, PortfolioInvestmentReport
 from src.investment.artefacts import generate_investment_report
+from src.decisions import (
+    DecisionLog, decision_from_scenario, decisions_from_risk_report,
+    decisions_from_investment, export_decision_log,
+)
 
 __version__ = "1.1.0"
 
@@ -46,6 +50,7 @@ class Session:
         self.report: PortfolioRiskReport | None = None
         self.benefit_report: PortfolioBenefitReport | None = None
         self.investment_report: PortfolioInvestmentReport | None = None
+        self.decision_log: DecisionLog = DecisionLog()
         self.benefits: list[Benefit] = []
         self.graph: DependencyGraph | None = None
         self.brand: BrandConfig = BrandConfig()
@@ -87,7 +92,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # pmo-brief
     brief_parser = subparsers.add_parser("brief", help="Generate stakeholder briefing")
-    brief_parser.add_argument("type", choices=["board", "steering", "project", "benefits", "investment", "all"], help="Briefing type")
+    brief_parser.add_argument("type", choices=["board", "steering", "project", "benefits", "investment", "decisions", "all"], help="Briefing type")
     brief_parser.add_argument("--logo", type=str, help="Path to logo image (PNG/JPG)")
     brief_parser.add_argument("--colour", type=str, help="Primary brand colour (hex, e.g. 1F4E79)")
     brief_parser.add_argument("--output-dir", type=str, help="Output directory")
@@ -200,6 +205,12 @@ def cmd_ingest(args) -> int:
         deduplicated, _session.report, _session.benefit_report
     )
 
+    # Populate decision log from analysis
+    _session.decision_log = DecisionLog()
+    decisions_from_risk_report(_session.report, _session.decision_log, _session.reference_date)
+    if _session.investment_report:
+        decisions_from_investment(_session.investment_report, _session.decision_log, _session.reference_date)
+
     if hasattr(args, "output_dir") and args.output_dir:
         _session.output_dir = Path(args.output_dir)
 
@@ -261,6 +272,9 @@ def cmd_scenario(args) -> int:
 
     result = simulate(action, _session.projects, _session.graph, _session.reference_date)
     narrative = generate_narrative(result)
+
+    # Add to decision log
+    decision_from_scenario(result, _session.decision_log, _session.reference_date)
 
     print(narrative.full_text)
 
@@ -334,6 +348,14 @@ def cmd_brief(args) -> int:
         elif args.type == "investment":
             print("No investment data available. Run 'pmo-copilot ingest' first.")
             return 1
+
+    if args.type in ("decisions", "all"):
+        if _session.decision_log.decisions:
+            p = export_decision_log(
+                _session.decision_log, brand=brand,
+                output_path=output_dir / "decision-log.docx",
+            )
+            generated.append(p)
 
     print(f"✓ Generated {len(generated)} artefact(s):")
     for g in generated:

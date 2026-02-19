@@ -1,184 +1,166 @@
 # Portfolio Risk Copilot
 
-**Turn messy project data into exec-ready briefings in under 5 minutes.**
+**AI-powered decision intelligence for PMOs.** Turn messy project data into exec-ready briefings, proactive risk analysis, benefits tracking, and portfolio "what-if" scenarios — in under 90 seconds.
 
-A free, open-source decision-support tool for PMOs and project leaders. Upload your Jira, Azure DevOps, or Smartsheet exports — get ranked risks, what-if scenarios, and board-ready briefings (Word & PowerPoint) powered by Claude Opus.
+> *"Before this, I spent 2-3 days per month assembling board packs from Jira exports and Excel trackers. Now I upload our data, run one command, and have an exec-ready briefing in 90 seconds."*
 
----
+## What It Does
 
-## Why This Exists
+Upload your Jira/DevOps/Smartsheet exports and benefits register. Get back:
 
-PMOs spend 40–60% of their time on manual reporting instead of strategic decision-making. Existing PM tools show *what is* (dashboards, status boards) but not *what if* (scenarios, forecasts, recommendations).
+| Artefact | What's in it |
+|----------|-------------|
+| **Board Briefing** (DOCX + PPTX) | Executive action summary, portfolio dashboard, top 3 risks, recommended decisions |
+| **Steering Committee Pack** (DOCX) | Full narrative with risk commentary, benefits & value section, talking points |
+| **Project Status Pack** (DOCX) | Per-project RAG status, risks, forecast deltas, action items |
+| **Benefits Report** (DOCX) | Realisation rates, drift analysis, benefits at risk, recommendations |
+| **Investment Summary** (DOCX) | ROI league table, Invest/Hold/Divest recommendations, cost-to-complete |
+| **Decision Log** (DOCX) | Structured audit trail of portfolio decisions with options and rationale |
 
-**Portfolio Risk Copilot** fills that gap:
-
-- **Risk detection** — Surfaces blocked work, chronic carry-over, budget overruns, and dependency risks automatically
-- **Scenario simulation** — Model budget cuts, scope changes, delays, and project removals with cascade impact analysis
-- **Exec-ready artefacts** — Generates board briefings, steering committee packs, and project status reports in Word/PowerPoint
-- **Tool-agnostic** — Works with exports from any PM tool (CSV, JSON, Excel)
-
----
+Every document opens with a punchy **executive action summary** — the paragraph a CXO reads on their phone at 7am.
 
 ## Quick Start
 
-### Installation
-
 ```bash
+# Clone
 git clone https://github.com/JustinNarracott/portfolio-risk-copilot.git
 cd portfolio-risk-copilot
+
+# Install dependencies
 pip install -r requirements.txt
-```
 
-### 90-Second Workflow
-
-```bash
-# 1. Ingest your project data
+# Run with sample data
 python -m src.cli ingest ./sample-data
-
-# 2. View top risks per project
 python -m src.cli risks
-
-# 3. Run a what-if scenario
-python -m src.cli scenario "cut Beta scope by 30%"
-
-# 4. Generate a steering committee briefing
-python -m src.cli brief steering --output-dir ./output
+python -m src.cli scenario "delay Alpha by 3 months"
+python -m src.cli brief all --output-dir ./output
 ```
 
-That's it. Open `./output/steering-committee-pack.docx` and you have an exec-ready pack.
-
----
+That's it. Seven documents in your `./output` folder.
 
 ## Commands
 
-### `pmo-copilot ingest <folder>`
+| Command | What it does |
+|---------|-------------|
+| `ingest <folder>` | Scan folder for CSV/JSON/Excel files, parse projects and benefits, run analysis |
+| `risks` | Display top 5 risks per project with plain-English explanations |
+| `risks --json` | Output risk report as JSON |
+| `scenario "<description>"` | Model a what-if scenario (e.g. "cut Beta budget by 30%") |
+| `brief board` | Generate board briefing (DOCX + PPTX) |
+| `brief steering` | Generate steering committee pack (DOCX) |
+| `brief project` | Generate per-project status packs (DOCX) |
+| `brief benefits` | Generate benefits realisation report (DOCX) |
+| `brief investment` | Generate portfolio investment summary (DOCX) |
+| `brief decisions` | Generate decision log (DOCX) |
+| `brief all` | Generate all artefacts |
 
-Scan a folder for CSV, JSON, and Excel files. Parses project metadata, tasks, statuses, dates, budgets, and comments. Runs initial risk analysis automatically.
+### Options
 
-**Supported formats:** CSV, JSON, Excel (XLSX). Flexible column mapping handles Jira, Azure DevOps, Smartsheet, and generic exports.
+```bash
+--output-dir ./my-folder    # Where to save generated files
+--logo ./logo.png           # Add your logo to briefings
+--colour 1F4E79             # Set primary brand colour (hex)
+```
 
-### `pmo-copilot risks`
+## What Data Do I Need?
 
-Display the top 5 risks per project with plain-English explanations.
+**Minimum:** A CSV/Excel export from your PM tool with columns for project name, task name, and task status.
 
-| Flag | Description |
-|------|-------------|
-| `--top N` | Show top N risks per project (default: 5) |
-| `--json` | Output raw JSON for programmatic use |
+**For full analysis:** Add budget, actual spend, dates, priorities, assignees, sprint history, and comments.
 
-**Risk categories detected:**
-- **Blocked Work** — Tasks stuck in blocked/waiting status for >2 weeks
-- **Chronic Carry-Over** — Tasks moved between 3+ sprints without completion
-- **Burn Rate** — Budget consumption >90% with >10% time remaining
-- **Dependencies** — Cross-project dependency risks from task comments
+**For benefits tracking:** A separate CSV/Excel with project name, expected benefit value, realised value, and status.
 
-### `pmo-copilot scenario "<description>"`
-
-Run a natural language what-if scenario and see the portfolio impact.
-
-**Supported scenarios:**
-- `"increase Alpha budget by 20%"` — Budget increase (percentage or absolute)
-- `"decrease Gamma budget by £50000"` — Budget decrease
-- `"cut Beta scope by 30%"` — Scope reduction with delivery date shift
-- `"delay Alpha by 1 quarter"` — Schedule delay with cascade impact
-- `"remove Delta"` — Project removal with dependency analysis
-
-### `pmo-copilot brief <type>`
-
-Generate stakeholder-specific briefing documents.
-
-| Type | Output | Content |
-|------|--------|---------|
-| `board` | DOCX + PPTX | 1-page portfolio health, top 3 risks, 3 decisions, RAG table |
-| `steering` | DOCX | 2-3 page exec summary, top 5 risks, decisions, talking points |
-| `project` | DOCX | Per-project status with RAG, risks, and action items |
-| `all` | All above | Full artefact set |
-
-| Flag | Description |
-|------|-------------|
-| `--logo <path>` | Company logo for document header (PNG/JPG) |
-| `--colour <hex>` | Primary brand colour (e.g. `003366`) |
-| `--output-dir <path>` | Output directory (default: current) |
-
----
+The parser handles messy column names, mixed date formats, and missing data gracefully. It supports exports from Jira, Azure DevOps, Smartsheet, MS Project, and generic trackers.
 
 ## Sample Data
 
-The `sample-data/` folder contains a representative dataset with 6 projects and 49 tasks, including baked-in risk patterns:
+The `sample-data/` folder contains a realistic 11-project portfolio:
 
-- **Alpha** — Active project with blocked work and dependency risks
-- **Beta** — Planning stage, minimal risks
-- **Gamma** — Critical burn rate (92.5% budget consumed)
-- **Delta** — Completed project (control case)
-- **Epsilon** — Critical burn rate (96.7% budget consumed)
-- **Zeta** — Early stage with dependency on product strategy
+- **portfolio-export.csv** — 11 projects, 69 tasks, mixed health states
+- **benefits-register.csv** — 21 benefits across 11 projects
+- **jira-export-sample.csv** — 6-project Jira export format
 
----
+Projects include platform rebuilds, mobile launches, compliance programmes, office relocations, security upgrades, and an on-hold HR system — the kind of portfolio a real PMO manages.
 
-## Architecture
+## Risk Detection
 
-```
-src/
-├── ingestion/          # File parsing & validation (CSV, JSON, Excel)
-│   ├── parser.py       # Flexible column mapping, 40+ aliases
-│   └── validators.py   # Format validation with actionable errors
-├── risk_engine/        # Risk detection & aggregation
-│   ├── blocked.py      # Blocked work detection
-│   ├── burnrate.py     # Budget burn rate alerts
-│   ├── carryover.py    # Chronic carry-over detection
-│   ├── dependencies.py # Cross-project dependency scanning
-│   └── engine.py       # Aggregation, RAG derivation, ranking
-├── scenario/           # What-if simulation
-│   ├── parser.py       # Natural language → structured actions
-│   ├── graph.py        # Dependency graph with transitive traversal
-│   ├── simulator.py    # Budget, scope, delay, remove simulators
-│   └── narrative.py    # CXO-level impact summaries
-├── artefacts/          # Document generation
-│   ├── docx_generator.py  # Word briefings (python-docx)
-│   └── pptx_generator.py  # PowerPoint slides (python-pptx)
-└── cli.py              # Unified command interface
-```
+The tool identifies five categories of risk:
 
-**Design principles:** Tool-agnostic, decision-first, narrative-driven, privacy-first (local execution, no data leaves your machine).
+1. **Blocked work** — tasks stuck with no resolution plan
+2. **Chronic carry-over** — tasks bouncing between sprints
+3. **Burn rate alerts** — budget consumption outpacing timeline
+4. **Dependency tangles** — tasks with multiple blocking dependencies
+5. **Benefits drift** — expected value eroding due to delivery issues
 
----
+Every risk gets a plain-English explanation and suggested mitigation. No jargon, no database field names.
 
-## Development
+## Scenario Simulation
 
-### Run Tests
+Model portfolio changes in natural language:
 
 ```bash
-python -m pytest                    # Full suite
-python -m pytest --cov=src -v       # With coverage
-python -m pytest tests/unit/        # Unit tests only
-python -m pytest tests/integration/ # E2E tests only
+python -m src.cli scenario "delay Alpha by 3 months"
+python -m src.cli scenario "cut Beta budget by 30%"
+python -m src.cli scenario "remove Delta from portfolio"
+python -m src.cli scenario "increase Zeta scope by 25%"
 ```
 
-### Current Metrics
+Each scenario produces a before/after impact summary with cascade effects on dependent projects and recommendations.
 
-- **421+ tests** across unit and integration suites
-- **95%+ coverage** across all modules
-- **<8 seconds** full suite execution
+## Benefits Intelligence
 
----
+Upload a benefits register and get:
 
-## Roadmap
+- **Realisation rates** per project and across the portfolio
+- **Benefits drift detection** — flags when expected value is eroding
+- **Drift RAG** — Green (<15%), Amber (15-30%), Red (>30%)
+- **CXO-readable explanations** — "Alpha was forecast to deliver £500k. Adjusted estimate is £320k — 36% drift."
+- **Recommendations** — escalate, protect, or write down
 
-### Phase 1 (Current) — Free Cowork Plugin
-- ✅ CSV/JSON/Excel ingestion with flexible mapping
-- ✅ 4 risk detection patterns with severity ranking
-- ✅ What-if scenario simulation with cascade impact
-- ✅ DOCX/PPTX artefact generation with branding
-- ✅ CLI with session state management
+## Investment Analysis
 
-### Phase 2 (Planned) — SaaS Version
-- Direct Jira/Azure DevOps/Smartsheet API integration
-- Team collaboration and shared portfolios
-- Monte Carlo forecasting
-- Continuous monitoring and alerts
-- Web UI with real-time dashboards
+See your portfolio through a financial lens:
 
----
+- **ROI per project** — ranked from best to worst return
+- **Invest/Hold/Divest recommendations** — based on ROI × RAG × drift
+- **Cost-to-complete** — how much more each project needs
+- **Reallocation opportunities** — where freed budget could go
+
+## Cowork Plugin
+
+This tool is designed to work as a Claude Cowork plugin:
+
+```
+/pmo-ingest ./project-data
+/pmo-risks
+/pmo-scenario "delay Alpha by 1 quarter"
+/pmo-brief all
+```
+
+See `.claude-plugin/marketplace.json` for the plugin manifest.
+
+## Tech Stack
+
+- **Python 3.11+** — core logic
+- **python-docx** — Word document generation
+- **python-pptx** — PowerPoint generation
+- **pandas** — data parsing
+- **openpyxl** — Excel support
+- **pytest** — 522 tests, 96% coverage
+
+## Project Status
+
+**v1.1.0** — Sprint 7 complete
+
+- ✅ Data ingestion (CSV, JSON, Excel) with flexible column mapping
+- ✅ Risk detection engine (5 categories, severity ranking, plain-English explanations)
+- ✅ Scenario simulator (budget, scope, delay, removal)
+- ✅ 7 artefact types (board, steering, project, benefits, investment, decisions, PPTX)
+- ✅ Benefits realisation tracking and drift detection
+- ✅ Portfolio investment & ROI analysis with Invest/Hold/Divest
+- ✅ Decision log generator (audit trail from scenarios and analysis)
+- ✅ Executive action summary (the "7am phone check" paragraph)
+- ✅ 522 tests, 96% coverage
 
 ## Contributing
 
@@ -186,8 +168,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENCE](LICENCE).
 
-## About
+## Built By
 
-Built by [Justin Narracott](https://github.com/JustinNarracott) as part of the [SignalBreak.io](https://signalbreak.io) AI governance platform. Powered by Claude Opus.
+[Your Name] — PMO consultant, AI governance practitioner, and founder of [SignalBreak.io](https://signalbreak.io).
+
+Built with Claude Opus as part of a 90-day public build sprint. Follow the journey on [Twitter/X](https://twitter.com/yourhandle) and [LinkedIn](https://linkedin.com/in/yourprofile).
