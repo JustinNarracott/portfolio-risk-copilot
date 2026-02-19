@@ -266,16 +266,18 @@ def _add_project_rag_table(doc: Document, report: PortfolioRiskReport, brand: Br
         bg = "F8F9FA" if idx % 2 == 0 else "FFFFFF"
         row.cells[0].text = s.project_name
         row.cells[1].text = s.project_status
-        # RAG cell — white text on coloured background
+        # RAG cell — dark text on light coloured background
         rag_cell = row.cells[2]
         rag_cell.text = ""
         p = rag_cell.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        run = p.add_run(s.rag_status)
+        run = p.add_run(f"  {s.rag_status}  ")
         run.font.bold = True
         run.font.size = Pt(9)
-        run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        _set_cell_bg(rag_cell, RAG_DARK.get(s.rag_status, "BDC3C7"))
+        run.font.name = "Calibri"
+        rag_text_col = RAG_COLOURS.get(s.rag_status, RGBColor(0x33, 0x33, 0x33))
+        run.font.color.rgb = rag_text_col
+        _set_cell_bg(rag_cell, RAG_BG.get(s.rag_status, "F0F0F0"))
         row.cells[3].text = str(s.risk_count)
         if detailed and s.risks:
             row.cells[4].text = s.risks[0].title

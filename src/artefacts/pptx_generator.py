@@ -43,18 +43,18 @@ def generate_board_slides(
     # ── Slide 1: Portfolio Dashboard ──
     slide1 = prs.slides.add_slide(prs.slide_layouts[6])
     slide1.background.fill.solid()
-    slide1.background.fill.fore_color.rgb = primary
+    slide1.background.fill.fore_color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
 
     # Title
     _text(slide1, "Portfolio Health — Board Briefing",
           0.7, 0.3, 12, 0.7, size=Pt(28), bold=True,
-          colour=RGBColor(0xFF, 0xFF, 0xFF), font=brand.heading_font)
+          colour=primary, font=brand.heading_font)
 
     # Subtitle
     _text(slide1, f"{len(report.project_summaries)} projects  •  "
           f"{report.projects_at_risk} at risk  •  {report.total_risks} risks",
           0.7, 1.05, 8, 0.4, size=Pt(14),
-          colour=RGBColor(0xCA, 0xDC, 0xFC), font=brand.body_font)
+          colour=RGBColor(0x70, 0x70, 0x70), font=brand.body_font)
 
     # Big RAG badge
     rag = report.portfolio_rag
@@ -162,12 +162,12 @@ def generate_board_slides(
     # Key decisions preview (right side)
     decisions = _get_decisions_text(report)
     _text(slide1, "KEY DECISIONS", 9.5, 3.8, 3.5, 0.35,
-          size=Pt(11), bold=True, colour=RGBColor(0xCA, 0xDC, 0xFC),
+          size=Pt(11), bold=True, colour=primary,
           font=brand.heading_font)
     for di, dec in enumerate(decisions[:3]):
         short = dec[:90] + ("..." if len(dec) > 90 else "")
         _text(slide1, f"{di+1}. {short}", 9.5, 4.2 + di * 0.85, 3.5, 0.8,
-              size=Pt(9), colour=RGBColor(0xFF, 0xFF, 0xFF), font=brand.body_font)
+              size=Pt(9), colour=RGBColor(0x50, 0x50, 0x50), font=brand.body_font)
 
     # ── Slide 2: Top Risks Detail ──
     slide2 = prs.slides.add_slide(prs.slide_layouts[6])
