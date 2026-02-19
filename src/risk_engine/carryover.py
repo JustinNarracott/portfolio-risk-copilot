@@ -62,10 +62,11 @@ def detect_carryover(project: Project, threshold: int = CARRYOVER_THRESHOLD) -> 
         sprint_history = " → ".join(all_sprints)
 
         explanation = (
-            f"In project {project.name}, the {task.priority.lower()}-priority task "
-            f"'{task.name}' (assigned to {task.assignee or 'unassigned'}) has been "
-            f"carried over across {sprint_count} sprints ({sprint_history}). "
-            f"This pattern indicates a persistent delivery blocker or incorrect estimation."
+            f"'{task.name}' has bounced across {sprint_count} sprints "
+            f"({sprint_history}) without getting done. "
+            f"Assigned to {task.assignee or 'nobody'} at {task.priority.lower()} priority. "
+            f"This is a delivery smell — either the task is too large, "
+            f"blocked on something unstated, or consistently deprioritised."
         )
 
         mitigation = _build_mitigation(task, sprint_count)
@@ -74,7 +75,7 @@ def detect_carryover(project: Project, threshold: int = CARRYOVER_THRESHOLD) -> 
             project_name=project.name,
             category=RiskCategory.CHRONIC_CARRYOVER,
             severity=severity,
-            title=f"Task '{task.name}' carried over {sprint_count} sprints",
+            title=f"'{task.name}' stuck — carried over {sprint_count} sprints",
             explanation=explanation,
             suggested_mitigation=mitigation,
         ))

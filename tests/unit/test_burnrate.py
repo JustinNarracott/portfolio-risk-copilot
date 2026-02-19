@@ -85,7 +85,7 @@ class TestDetectBurnRateSynthetic:
         risks = detect_burn_rate(project, reference_date=date(2026, 3, 15))
         assert len(risks) == 1
         assert risks[0].severity == RiskSeverity.CRITICAL
-        assert "exceeded budget" in risks[0].title.lower()
+        assert "over budget" in risks[0].title.lower()
 
     def test_zero_budget_skipped(self):
         """Projects with no budget should be skipped."""
@@ -160,7 +160,7 @@ class TestDetectBurnRateSynthetic:
         )
         risks = detect_burn_rate(project, reference_date=REF_DATE)
         assert risks[0].suggested_mitigation != ""
-        assert "steering committee" in risks[0].suggested_mitigation.lower()
+        assert "options" in risks[0].suggested_mitigation.lower() or "leadership" in risks[0].suggested_mitigation.lower()
 
     def test_zero_duration_project_skipped(self):
         """Project with same start and end date should be skipped."""

@@ -80,9 +80,9 @@ def detect_blocked_work(project: Project) -> list[Risk]:
 
         # Build title
         if status_blocked:
-            title = f"Task '{task.name}' is {task.status.lower()}"
+            title = f"'{task.name}' is stuck ({task.status.lower()}) — delivery blocked"
         else:
-            title = f"Task '{task.name}' has blocker in comments"
+            title = f"'{task.name}' has a reported blocker — needs resolution"
 
         risks.append(Risk(
             project_name=project.name,
@@ -175,30 +175,32 @@ def _build_explanation(
     comment_blocked: bool,
     blocker_detail: str,
 ) -> str:
-    """Build a plain-English risk explanation."""
-    parts: list[str] = []
-
-    parts.append(
-        f"In project {project_name}, the {task.priority.lower()}-priority task "
-        f"'{task.name}' (assigned to {task.assignee or 'unassigned'})"
-    )
+    """Build an insight-driven risk explanation. Leads with impact, not database fields."""
+    assignee = task.assignee or "no owner assigned"
 
     if status_blocked and comment_blocked:
-        parts.append(
-            f" has status '{task.status}' and comments indicate a blocker: "
-            f'"{blocker_detail}".'
+        return (
+            f"'{task.name}' is stuck — currently {task.status.lower()} "
+            f"with a reported blocker ({blocker_detail}). "
+            f"Assigned to {assignee}. Until this is resolved, "
+            f"downstream work in {project_name} cannot progress."
         )
     elif status_blocked:
-        parts.append(f" has status '{task.status}'.")
+        detail = ""
         if task.comments:
-            parts.append(f' Comments: "{task.comments[:120]}{"..." if len(task.comments) > 120 else ""}".')
-    else:
-        parts.append(
-            f" has a blocker indicated in comments: "
-            f'"{blocker_detail}".'
+            detail = f" Context: \"{task.comments[:100]}{'...' if len(task.comments) > 100 else ''}\"."
+        return (
+            f"'{task.name}' has been {task.status.lower()} with {assignee} "
+            f"and no clear resolution path.{detail} "
+            f"This is a {task.priority.lower()}-priority deliverable for {project_name}."
         )
-
-    return "".join(parts)
+    else:
+        return (
+            f"'{task.name}' ({assignee}) has a dependency blocker: "
+            f"{blocker_detail}. "
+            f"This {task.priority.lower()}-priority task cannot advance until "
+            f"the blocker is cleared."
+        )
 
 
 def _build_mitigation(

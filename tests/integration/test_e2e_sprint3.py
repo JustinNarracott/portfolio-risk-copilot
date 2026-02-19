@@ -57,7 +57,7 @@ class TestFullArtefactPipeline:
         # Exec summary
         assert "Executive Summary" in full_text or "portfolio" in full_text.lower()
         # Risk section
-        assert "[Critical]" in full_text or "[High]" in full_text
+        assert "CRITICAL" in full_text or "HIGH" in full_text
         # Decisions
         assert "Recommended" in full_text or "decision" in full_text.lower()
         # RAG table exists
@@ -127,9 +127,14 @@ class TestFullArtefactPipeline:
         generate_steering_pack(report, brand=brand, output_path=steering)
         generate_board_slides(report, brand=brand, output_path=pptx)
 
-        # Verify custom headings applied
+        # Verify custom headings applied (header bar is a table cell)
         doc = Document(str(board))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
+        parts = [p.text for p in doc.paragraphs]
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    parts.append(cell.text)
+        full_text = "\n".join(parts)
         assert "Acme Corp — Portfolio Dashboard" in full_text
         assert "Priority Risk Items" in full_text
         assert "Actions for Board Approval" in full_text

@@ -1,4 +1,4 @@
-"""Unit tests for DOCX generator (Issues #18, #19, #20, #22)."""
+"""Unit tests for DOCX generator (Issues #18-#22) — upgraded design."""
 
 from datetime import date
 from pathlib import Path
@@ -7,19 +7,9 @@ import pytest
 from docx import Document
 
 from src.ingestion.parser import parse_file
-from src.risk_engine.engine import (
-    PortfolioRiskReport,
-    ProjectRiskSummary,
-    Risk,
-    RiskCategory,
-    RiskSeverity,
-    analyse_portfolio,
-)
+from src.risk_engine.engine import PortfolioRiskReport, analyse_portfolio
 from src.artefacts.docx_generator import (
-    BrandConfig,
-    generate_board_briefing,
-    generate_steering_pack,
-    generate_project_status_pack,
+    BrandConfig, generate_board_briefing, generate_steering_pack, generate_project_status_pack,
 )
 
 SAMPLE_CSV = Path(__file__).parent.parent.parent / "sample-data" / "jira-export-sample.csv"
@@ -32,226 +22,137 @@ def report() -> PortfolioRiskReport:
     return analyse_portfolio(projects, top_n=5, reference_date=REF_DATE)
 
 
-# ──────────────────────────────────────────────
-# Board briefing (Issue #18)
-# ──────────────────────────────────────────────
+def _full_text(doc: Document) -> str:
+    parts = [p.text for p in doc.paragraphs]
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                parts.append(cell.text)
+    return "\n".join(parts)
 
 
 class TestBoardBriefing:
-
     def test_generates_valid_docx(self, report, tmp_path):
-        out = tmp_path / "board.docx"
-        result = generate_board_briefing(report, output_path=out)
+        result = generate_board_briefing(report, output_path=tmp_path / "b.docx")
         assert result.exists()
-        doc = Document(str(result))
-        assert len(doc.paragraphs) > 0
+        assert len(Document(str(result)).paragraphs) > 0
 
-    def test_contains_portfolio_status(self, report, tmp_path):
-        out = tmp_path / "board.docx"
-        generate_board_briefing(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Portfolio" in full_text
+    def test_contains_portfolio_and_rag(self, report, tmp_path):
+        generate_board_briefing(report, output_path=tmp_path / "b.docx")
+        text = _full_text(Document(str(tmp_path / "b.docx")))
+        assert "Portfolio" in text
+        assert report.portfolio_rag in text
 
-    def test_contains_rag_status(self, report, tmp_path):
-        out = tmp_path / "board.docx"
-        generate_board_briefing(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert report.portfolio_rag in full_text
+    def test_contains_risks_and_decisions(self, report, tmp_path):
+        generate_board_briefing(report, output_path=tmp_path / "b.docx")
+        text = _full_text(Document(str(tmp_path / "b.docx")))
+        assert "Risk" in text
+        assert any(w in text for w in ("Recommended", "Decision", "decision", "URGENT"))
 
-    def test_contains_risk_section(self, report, tmp_path):
-        out = tmp_path / "board.docx"
-        generate_board_briefing(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Risk" in full_text
+    def test_has_dashboard_and_rag_tables(self, report, tmp_path):
+        generate_board_briefing(report, output_path=tmp_path / "b.docx")
+        doc = Document(str(tmp_path / "b.docx"))
+        assert len(doc.tables) >= 3  # header bar + dashboard + RAG table
 
-    def test_contains_decisions(self, report, tmp_path):
-        out = tmp_path / "board.docx"
-        generate_board_briefing(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Recommended" in full_text or "Decision" in full_text or "decision" in full_text
-
-    def test_has_table(self, report, tmp_path):
-        out = tmp_path / "board.docx"
-        generate_board_briefing(report, output_path=out)
-        doc = Document(str(out))
-        assert len(doc.tables) >= 1
-
-    def test_table_has_all_projects(self, report, tmp_path):
-        out = tmp_path / "board.docx"
-        generate_board_briefing(report, output_path=out)
-        doc = Document(str(out))
-        table = doc.tables[0]
-        table_text = " ".join(cell.text for row in table.rows for cell in row.cells)
-        for summary in report.project_summaries:
-            assert summary.project_name in table_text
+    def test_all_projects_in_table(self, report, tmp_path):
+        generate_board_briefing(report, output_path=tmp_path / "b.docx")
+        text = _full_text(Document(str(tmp_path / "b.docx")))
+        for s in report.project_summaries:
+            assert s.project_name in text
 
     def test_default_output_path(self, report, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        result = generate_board_briefing(report)
-        assert result.name == "board-briefing.docx"
-
-
-# ──────────────────────────────────────────────
-# Steering committee pack (Issue #19)
-# ──────────────────────────────────────────────
+        assert generate_board_briefing(report).name == "board-briefing.docx"
 
 
 class TestSteeringPack:
-
     def test_generates_valid_docx(self, report, tmp_path):
-        out = tmp_path / "steering.docx"
-        result = generate_steering_pack(report, output_path=out)
+        result = generate_steering_pack(report, output_path=tmp_path / "s.docx")
         assert result.exists()
-        doc = Document(str(result))
-        assert len(doc.paragraphs) > 10  # Should be substantial
+        assert len(Document(str(result)).paragraphs) > 10
 
     def test_contains_exec_summary(self, report, tmp_path):
-        out = tmp_path / "steering.docx"
-        generate_steering_pack(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Executive Summary" in full_text or "Exec" in full_text
+        generate_steering_pack(report, output_path=tmp_path / "s.docx")
+        text = _full_text(Document(str(tmp_path / "s.docx")))
+        assert "Executive Summary" in text
 
-    def test_contains_top_5_risks(self, report, tmp_path):
-        out = tmp_path / "steering.docx"
-        generate_steering_pack(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        # Should have at least some severity indicators
-        assert "[Critical]" in full_text or "[High]" in full_text
+    def test_contains_severity_badges(self, report, tmp_path):
+        generate_steering_pack(report, output_path=tmp_path / "s.docx")
+        text = _full_text(Document(str(tmp_path / "s.docx")))
+        assert "CRITICAL" in text or "HIGH" in text
 
     def test_contains_talking_points(self, report, tmp_path):
-        out = tmp_path / "steering.docx"
-        generate_steering_pack(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Talking" in full_text or "talking" in full_text
+        generate_steering_pack(report, output_path=tmp_path / "s.docx")
+        text = _full_text(Document(str(tmp_path / "s.docx")))
+        assert "Talking" in text
 
-    def test_has_detailed_table(self, report, tmp_path):
-        out = tmp_path / "steering.docx"
-        generate_steering_pack(report, output_path=out)
-        doc = Document(str(out))
-        assert len(doc.tables) >= 1
-        # Detailed table should have 5 columns
-        table = doc.tables[0]
-        assert len(table.columns) == 5
+    def test_has_risk_distribution(self, report, tmp_path):
+        generate_steering_pack(report, output_path=tmp_path / "s.docx")
+        text = _full_text(Document(str(tmp_path / "s.docx")))
+        assert "Risk Distribution" in text
 
-    def test_more_content_than_board_briefing(self, report, tmp_path):
-        board_path = tmp_path / "board.docx"
-        steering_path = tmp_path / "steering.docx"
-        generate_board_briefing(report, output_path=board_path)
-        generate_steering_pack(report, output_path=steering_path)
-        # Steering should have more paragraphs
-        board_doc = Document(str(board_path))
-        steering_doc = Document(str(steering_path))
-        assert len(steering_doc.paragraphs) > len(board_doc.paragraphs)
-
-
-# ──────────────────────────────────────────────
-# Project status pack (Issue #20)
-# ──────────────────────────────────────────────
+    def test_more_content_than_board(self, report, tmp_path):
+        generate_board_briefing(report, output_path=tmp_path / "b.docx")
+        generate_steering_pack(report, output_path=tmp_path / "s.docx")
+        assert len(Document(str(tmp_path / "s.docx")).paragraphs) > len(Document(str(tmp_path / "b.docx")).paragraphs)
 
 
 class TestProjectStatusPack:
-
     def test_generates_valid_docx(self, report, tmp_path):
-        out = tmp_path / "status.docx"
-        result = generate_project_status_pack(report, output_path=out)
-        assert result.exists()
+        assert generate_project_status_pack(report, output_path=tmp_path / "p.docx").exists()
 
     def test_contains_all_projects(self, report, tmp_path):
-        out = tmp_path / "status.docx"
-        generate_project_status_pack(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        for summary in report.project_summaries:
-            assert summary.project_name in full_text
+        generate_project_status_pack(report, output_path=tmp_path / "p.docx")
+        text = _full_text(Document(str(tmp_path / "p.docx")))
+        for s in report.project_summaries:
+            assert s.project_name in text
 
-    def test_contains_rag_per_project(self, report, tmp_path):
-        out = tmp_path / "status.docx"
-        generate_project_status_pack(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Status:" in full_text
+    def test_contains_rag_values(self, report, tmp_path):
+        generate_project_status_pack(report, output_path=tmp_path / "p.docx")
+        text = _full_text(Document(str(tmp_path / "p.docx")))
+        for rag in {s.rag_status for s in report.project_summaries}:
+            assert rag in text
 
-    def test_contains_action_items(self, report, tmp_path):
-        out = tmp_path / "status.docx"
-        generate_project_status_pack(report, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Action" in full_text
-
-
-# ──────────────────────────────────────────────
-# Template customisation (Issue #22)
-# ──────────────────────────────────────────────
+    def test_contains_actions(self, report, tmp_path):
+        generate_project_status_pack(report, output_path=tmp_path / "p.docx")
+        text = _full_text(Document(str(tmp_path / "p.docx")))
+        assert "Action" in text
 
 
 class TestBrandCustomisation:
-
-    def test_custom_colours_applied(self, report, tmp_path):
+    def test_custom_colours(self, report, tmp_path):
         brand = BrandConfig(primary_colour="990000", accent_colour="CC3333")
-        out = tmp_path / "custom.docx"
-        generate_board_briefing(report, brand=brand, output_path=out)
-        assert out.exists()
+        assert generate_board_briefing(report, brand=brand, output_path=tmp_path / "c.docx").exists()
 
-    def test_custom_headings(self, report, tmp_path):
-        brand = BrandConfig(custom_headings={
-            "board_title": "Monthly Portfolio Update",
-            "top_risks": "Key Risk Areas",
-        })
-        out = tmp_path / "custom.docx"
-        generate_board_briefing(report, brand=brand, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Monthly Portfolio Update" in full_text
-        assert "Key Risk Areas" in full_text
+    def test_custom_headings_board(self, report, tmp_path):
+        brand = BrandConfig(custom_headings={"board_title": "Monthly Portfolio Update", "top_risks": "Key Risk Areas"})
+        generate_board_briefing(report, brand=brand, output_path=tmp_path / "c.docx")
+        text = _full_text(Document(str(tmp_path / "c.docx")))
+        assert "Monthly Portfolio Update" in text
+        assert "Key Risk Areas" in text
+
+    def test_custom_headings_steering(self, report, tmp_path):
+        brand = BrandConfig(custom_headings={"steering_title": "Custom Steering Title"})
+        generate_steering_pack(report, brand=brand, output_path=tmp_path / "s.docx")
+        text = _full_text(Document(str(tmp_path / "s.docx")))
+        assert "Custom Steering Title" in text
+
+    def test_logo_valid(self, report, tmp_path):
+        logo = tmp_path / "logo.png"
+        _create_tiny_png(logo)
+        brand = BrandConfig(logo_path=str(logo))
+        assert generate_board_briefing(report, brand=brand, output_path=tmp_path / "l.docx").exists()
+
+    def test_logo_invalid_ignored(self, report, tmp_path):
+        brand = BrandConfig(logo_path="/nonexistent/logo.png")
+        assert generate_board_briefing(report, brand=brand, output_path=tmp_path / "n.docx").exists()
 
     def test_custom_font(self, report, tmp_path):
         brand = BrandConfig(heading_font="Arial", body_font="Arial")
-        out = tmp_path / "custom.docx"
-        generate_board_briefing(report, brand=brand, output_path=out)
-        assert out.exists()
-
-    def test_logo_with_valid_path(self, report, tmp_path):
-        # Create a tiny valid PNG
-        logo_path = tmp_path / "logo.png"
-        _create_tiny_png(logo_path)
-
-        brand = BrandConfig(logo_path=str(logo_path))
-        out = tmp_path / "logo_test.docx"
-        generate_board_briefing(report, brand=brand, output_path=out)
-        assert out.exists()
-
-    def test_logo_with_invalid_path_ignored(self, report, tmp_path):
-        brand = BrandConfig(logo_path="/nonexistent/logo.png")
-        out = tmp_path / "no_logo.docx"
-        generate_board_briefing(report, brand=brand, output_path=out)
-        assert out.exists()
-
-    def test_customisation_applies_to_steering(self, report, tmp_path):
-        brand = BrandConfig(custom_headings={
-            "steering_title": "Custom Steering Title",
-        })
-        out = tmp_path / "steering_custom.docx"
-        generate_steering_pack(report, brand=brand, output_path=out)
-        doc = Document(str(out))
-        full_text = "\n".join(p.text for p in doc.paragraphs)
-        assert "Custom Steering Title" in full_text
-
-    def test_customisation_applies_to_status_pack(self, report, tmp_path):
-        brand = BrandConfig(company_name="Acme Corp")
-        out = tmp_path / "status_custom.docx"
-        generate_project_status_pack(report, brand=brand, output_path=out)
-        assert out.exists()
+        assert generate_board_briefing(report, brand=brand, output_path=tmp_path / "f.docx").exists()
 
 
 def _create_tiny_png(path: Path) -> None:
-    """Create a minimal valid 1x1 PNG file."""
     import struct, zlib
     sig = b"\x89PNG\r\n\x1a\n"
     ihdr_data = struct.pack(">IIBBBBB", 1, 1, 8, 2, 0, 0, 0)

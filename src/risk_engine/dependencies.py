@@ -73,21 +73,21 @@ def detect_dependencies(project: Project) -> list[Risk]:
         severity = _calculate_severity(task, dep_count)
 
         # Build dependency summary
-        dep_descriptions = [f'"{m["context"]}" ({m["keyword"]})' for m in matches]
-        dep_summary = "; ".join(dep_descriptions)
+        dep_descriptions = [m["context"] for m in matches]
+        dep_summary = "; ".join(dep_descriptions[:3])
 
         explanation = (
-            f"In project {project.name}, the {task.priority.lower()}-priority task "
-            f"'{task.name}' (assigned to {task.assignee or 'unassigned'}) "
-            f"has {dep_count} dependency indicator{'s' if dep_count > 1 else ''} "
-            f"in comments: {dep_summary}."
+            f"'{task.name}' ({task.assignee or 'unassigned'}) is tangled in "
+            f"{dep_count} {'dependencies' if dep_count > 1 else 'dependency'}: "
+            f"{dep_summary}. "
+            f"{'Multiple dependencies compound the risk — if any one slips, this task stalls.' if dep_count > 1 else 'If this dependency slips, the task stalls.'}"
         )
 
         mitigation = _build_mitigation(task, matches, dep_count)
 
         title = (
-            f"Task '{task.name}' has {dep_count} "
-            f"{'dependencies' if dep_count > 1 else 'dependency'}"
+            f"'{task.name}': {dep_count} "
+            f"{'dependencies' if dep_count > 1 else 'dependency'} — delivery at risk"
         )
 
         risks.append(Risk(

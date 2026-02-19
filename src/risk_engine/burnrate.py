@@ -85,17 +85,19 @@ def _build_overspend_risk(project: Project, spend_pct: float) -> Risk:
         project_name=project.name,
         category=RiskCategory.BURN_RATE,
         severity=RiskSeverity.CRITICAL,
-        title=f"Project '{project.name}' has exceeded budget by {_fmt_currency(overspend_amount)}",
+        title=f"{project.name} is over budget by {_fmt_currency(overspend_amount)}",
         explanation=(
-            f"Project {project.name} has spent {_fmt_currency(project.actual_spend)} "
-            f"against a budget of {_fmt_currency(project.budget)} "
-            f"({_fmt_pct(spend_pct)} of budget consumed). "
-            f"The project is over budget by {_fmt_currency(overspend_amount)}."
+            f"{project.name} has spent {_fmt_currency(project.actual_spend)} "
+            f"against a {_fmt_currency(project.budget)} budget — "
+            f"{_fmt_pct(spend_pct)} consumed. "
+            f"The project is {_fmt_currency(overspend_amount)} over budget "
+            f"with no additional funding approved. "
+            f"Every week of continued spend deepens the overrun."
         ),
         suggested_mitigation=(
-            f"Immediately review spending on {project.name}. "
-            f"Consider requesting additional budget, reducing scope, "
-            f"or pausing non-critical work streams to contain costs."
+            f"Halt non-critical spend on {project.name} immediately. "
+            f"Present options to the sponsor: approve a {_fmt_currency(overspend_amount)}+ "
+            f"budget top-up, or cut remaining scope to close within current allocation."
         ),
     )
 
@@ -108,50 +110,52 @@ def _build_burn_rate_risk(
 ) -> Risk:
     """Build risk for project burning budget faster than time elapsed."""
     severity = _burn_rate_severity(spend_pct, time_remaining_pct)
+    remaining_budget = project.budget - project.actual_spend
 
     return Risk(
         project_name=project.name,
         category=RiskCategory.BURN_RATE,
         severity=severity,
         title=(
-            f"Project '{project.name}' has consumed {_fmt_pct(spend_pct)} of budget "
-            f"with {_fmt_pct(time_remaining_pct)} of time remaining"
+            f"{project.name}: {_fmt_pct(spend_pct)} of budget gone, "
+            f"{_fmt_pct(time_remaining_pct)} of timeline left"
         ),
         explanation=(
-            f"Project {project.name} has spent {_fmt_currency(project.actual_spend)} "
-            f"of its {_fmt_currency(project.budget)} budget "
-            f"({_fmt_pct(spend_pct)} consumed). "
-            f"However, {_fmt_pct(time_remaining_pct)} of the project timeline remains "
-            f"({project.end_date.isoformat() if project.end_date else 'unknown'} end date). "
-            f"At the current burn rate, the project will exhaust its budget "
-            f"before completion."
+            f"{project.name} is burning cash faster than the clock. "
+            f"{_fmt_currency(project.actual_spend)} spent of {_fmt_currency(project.budget)} "
+            f"({_fmt_pct(spend_pct)}), but {_fmt_pct(time_remaining_pct)} of the delivery "
+            f"window remains. Only {_fmt_currency(remaining_budget)} left to cover "
+            f"the remaining work. At current velocity, the budget will run out "
+            f"before delivery completes."
         ),
         suggested_mitigation=(
-            f"Review spending trajectory on {project.name}. "
-            f"Identify the largest cost drivers and assess whether "
-            f"scope reduction, timeline extension, or additional funding is needed. "
-            f"Flag to steering committee for decision."
+            f"Three options for leadership: (1) Approve a budget top-up of "
+            f"~{_fmt_currency(remaining_budget * 0.5)} to provide runway, "
+            f"(2) Cut scope to fit remaining {_fmt_currency(remaining_budget)}, or "
+            f"(3) Accelerate the timeline to reduce fixed costs. "
+            f"Decision needed within 2 weeks."
         ),
     )
 
 
 def _build_high_spend_no_dates_risk(project: Project, spend_pct: float) -> Risk:
-    """Build risk for high spend without date information to calculate timeline."""
+    """Build risk for high spend without date information."""
     return Risk(
         project_name=project.name,
         category=RiskCategory.BURN_RATE,
         severity=RiskSeverity.HIGH,
-        title=f"Project '{project.name}' has consumed {_fmt_pct(spend_pct)} of budget",
+        title=f"{project.name}: {_fmt_pct(spend_pct)} of budget consumed — no timeline data",
         explanation=(
-            f"Project {project.name} has spent {_fmt_currency(project.actual_spend)} "
-            f"of its {_fmt_currency(project.budget)} budget "
-            f"({_fmt_pct(spend_pct)} consumed). "
-            f"Timeline data is unavailable, so remaining duration cannot be assessed. "
-            f"The high spend level warrants review."
+            f"{project.name} has burned through {_fmt_pct(spend_pct)} of its "
+            f"{_fmt_currency(project.budget)} budget "
+            f"({_fmt_currency(project.actual_spend)} spent). "
+            f"No timeline data is available, so it's unclear whether this "
+            f"spend rate is on track. This is a blind spot."
         ),
         suggested_mitigation=(
-            f"Confirm project timeline for {project.name} and assess "
-            f"whether remaining budget is sufficient for completion."
+            f"Urgently confirm the delivery timeline for {project.name}. "
+            f"Without dates, it's impossible to assess whether the remaining "
+            f"{_fmt_currency(project.budget - project.actual_spend)} is sufficient."
         ),
     )
 
