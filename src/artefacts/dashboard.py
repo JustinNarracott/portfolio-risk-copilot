@@ -63,13 +63,15 @@ def _add_kpi_row(doc: Document, kpis: list[tuple[str, str, str]], brand: BrandCo
     for i, (label, value, colour) in enumerate(kpis):
         cell = table.rows[0].cells[i]
         _set_cell_bg(cell, "F8F9FA")
-        _set_cell_margins(cell, 80, 80, 120, 120)
+        _set_cell_margins(cell, 50, 50, 80, 80)
 
         # Value (large)
         p = cell.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after = Pt(0)
         run = p.add_run(value)
-        run.font.size = Pt(20)
+        run.font.size = Pt(16)
         run.font.bold = True
         run.font.color.rgb = RGBColor.from_string(colour)
         run.font.name = brand.body_font
@@ -77,8 +79,10 @@ def _add_kpi_row(doc: Document, kpis: list[tuple[str, str, str]], brand: BrandCo
         # Label (small)
         p2 = cell.add_paragraph()
         p2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p2.paragraph_format.space_before = Pt(0)
+        p2.paragraph_format.space_after = Pt(0)
         lab = p2.add_run(label)
-        lab.font.size = Pt(8)
+        lab.font.size = Pt(7)
         lab.font.color.rgb = RGBColor(0x7F, 0x8C, 0x8D)
         lab.font.name = brand.body_font
 
@@ -161,6 +165,13 @@ def generate_portfolio_dashboard(
     doc = Document()
     _apply_base_styles(doc, brand)
 
+    # Tighten margins for dashboard (0.5 inch all round)
+    for section in doc.sections:
+        section.top_margin = Cm(1.2)
+        section.bottom_margin = Cm(1.0)
+        section.left_margin = Cm(1.5)
+        section.right_margin = Cm(1.5)
+
     # ── Page 1: Health Overview ──
     _add_header_bar(doc, brand, _h(brand, "dashboard_title", "Portfolio Dashboard"))
 
@@ -184,7 +195,6 @@ def generate_portfolio_dashboard(
         ("TOTAL RISKS", str(total_risks), "E74C3C" if total_risks > 10 else "F39C12" if total_risks > 5 else "27AE60"),
     ]
     _add_kpi_row(doc, kpis_row1, brand)
-    doc.add_paragraph()
 
     # KPI cards row 2: Financial & benefits
     total_budget = sum((p.budget or 0) for p in projects) if projects else 0
@@ -193,7 +203,7 @@ def generate_portfolio_dashboard(
 
     kpis_row2 = [
         ("TOTAL BUDGET", f"£{total_budget / 1000:.0f}k", brand.primary_colour),
-        ("TOTAL SPENT", f"£{total_spend / 1000:.0f}k", _pct_colour(1 - budget_pct)),
+        ("SPENT", f"£{total_spend / 1000:.0f}k", _pct_colour(1 - budget_pct)),
         ("BUDGET USED", f"{budget_pct * 100:.0f}%", _pct_colour(budget_pct, invert=True)),
     ]
 
@@ -205,22 +215,25 @@ def generate_portfolio_dashboard(
     if investment_report:
         kpis_row2.append(
             ("PORTFOLIO ROI", f"{investment_report.portfolio_roi * 100:.0f}%",
-             _kpi_colour(investment_report.portfolio_roi / 2))  # Scale for colour
+             _kpi_colour(investment_report.portfolio_roi / 2))
         )
 
     _add_kpi_row(doc, kpis_row2, brand)
-    doc.add_paragraph()
 
-    # Dashboard composite chart
+    # Dashboard composite chart (compact for tight page fit)
     try:
-        from src.charts import chart_portfolio_dashboard
-        chart_path = chart_portfolio_dashboard(report, benefit_report, investment_report, projects)
-        doc.add_picture(str(chart_path), width=Inches(6.5))
+        from src.charts import chart_portfolio_dashboard_compact
+        chart_path = chart_portfolio_dashboard_compact(report, benefit_report, investment_report, projects)
+        pic = doc.add_picture(str(chart_path), width=Inches(6.0))
         doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
     except Exception:
-        pass
-
-    doc.add_paragraph()
+        try:
+            from src.charts import chart_portfolio_dashboard
+            chart_path = chart_portfolio_dashboard(report, benefit_report, investment_report, projects)
+            doc.add_picture(str(chart_path), width=Inches(5.5))
+            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        except Exception:
+            pass
 
     # ── Page 2: Detail view ──
     doc.add_page_break()
@@ -228,7 +241,6 @@ def generate_portfolio_dashboard(
     # RAG summary table
     _add_section_heading(doc, brand, "Project RAG Summary")
     _add_rag_summary_table(doc, report, projects, brand)
-    doc.add_paragraph()
 
     # Side-by-side: Benefits waterfall + ROI bubble
     charts_added = False

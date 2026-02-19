@@ -603,3 +603,112 @@ def chart_portfolio_dashboard(
 
     fig.suptitle("Portfolio Dashboard", fontsize=14, fontweight="bold", color=COLOURS["primary"], y=0.98)
     return _save(fig, "portfolio_dashboard", dpi=220)
+
+
+def chart_portfolio_dashboard_compact(
+    risk_report: PortfolioRiskReport,
+    benefit_report: PortfolioBenefitReport | None = None,
+    investment_report: PortfolioInvestmentReport | None = None,
+    projects: list | None = None,
+) -> Path:
+    """Compact 2×2 dashboard for tight page fits (smaller figure)."""
+    budget_map: dict[str, tuple[float, float]] = {}
+    if projects:
+        for p in projects:
+            if p.name not in budget_map:
+                budget_map[p.name] = (p.budget or 0, p.actual_spend or 0)
+
+    fig = plt.figure(figsize=(9, 5.5))
+    gs = GridSpec(2, 2, figure=fig, hspace=0.4, wspace=0.35)
+
+    # 1. RAG donut (top-left)
+    ax1 = fig.add_subplot(gs[0, 0])
+    counts = {"Red": 0, "Amber": 0, "Green": 0}
+    for s in risk_report.project_summaries:
+        counts[s.rag_status] = counts.get(s.rag_status, 0) + 1
+    labels = [k for k, v in counts.items() if v > 0]
+    sizes = [counts[k] for k in labels]
+    colors = [RAG_COLOURS[k] for k in labels]
+    wedges, texts, autotexts = ax1.pie(
+        sizes, labels=None, colors=colors, autopct=lambda p: f"{int(round(p * sum(sizes) / 100))}",
+        startangle=90, pctdistance=0.75, wedgeprops=dict(width=0.35, edgecolor="white", linewidth=2),
+        textprops={"fontsize": 11, "fontweight": "bold", "color": "white"},
+    )
+    ax1.text(0, 0.08, str(sum(sizes)), ha="center", va="center", fontsize=20, fontweight="bold", color=COLOURS["primary"])
+    ax1.text(0, -0.15, "PROJECTS", ha="center", va="center", fontsize=6, fontweight="bold", color=COLOURS["dark_grey"])
+    legend_patches = [mpatches.Patch(color=RAG_COLOURS[k], label=f"{k} ({counts[k]})") for k in ["Red", "Amber", "Green"] if counts[k] > 0]
+    ax1.legend(handles=legend_patches, loc="lower center", bbox_to_anchor=(0.5, -0.1), ncol=3, fontsize=6, frameon=False)
+    ax1.set_title("Portfolio Health", fontsize=9, fontweight="bold", color=COLOURS["primary"], pad=6)
+
+    # 2. Budget vs Spend (top-right)
+    ax2 = fig.add_subplot(gs[0, 1])
+    summaries_b = sorted(risk_report.project_summaries, key=lambda s: -budget_map.get(s.project_name, (0, 0))[0])
+    summaries_b = [s for s in summaries_b if budget_map.get(s.project_name, (0, 0))[0] > 0][:8]
+    if summaries_b:
+        bnames = [s.project_name.split(" - ")[0][:12] if " - " in s.project_name else s.project_name[:12] for s in summaries_b]
+        budgets = [budget_map.get(s.project_name, (0, 0))[0] for s in summaries_b]
+        spends = [budget_map.get(s.project_name, (0, 0))[1] for s in summaries_b]
+        y = np.arange(len(bnames))
+        h = 0.35
+        ax2.barh(y + h/2, budgets, h, label="Budget", color=COLOURS["accent"], alpha=0.3, edgecolor=COLOURS["accent"])
+        spend_bars = ax2.barh(y - h/2, spends, h, label="Spent", color=COLOURS["accent"], edgecolor=COLOURS["accent"])
+        for i, (b, s) in enumerate(zip(budgets, spends)):
+            if b > 0 and s / b > 0.85:
+                spend_bars[i].set_color(COLOURS["red"])
+                spend_bars[i].set_edgecolor(COLOURS["red"])
+        ax2.set_yticks(y)
+        ax2.set_yticklabels(bnames, fontsize=6)
+        ax2.invert_yaxis()
+        ax2.legend(fontsize=6, frameon=False, loc="lower right")
+        ax2.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"£{x/1000:.0f}k"))
+    _style_ax(ax2)
+    ax2.tick_params(labelsize=6)
+    ax2.set_title("Budget vs Spend", fontsize=9, fontweight="bold", color=COLOURS["primary"], pad=6)
+
+    # 3. Risk Heatmap (bottom-left)
+    ax3 = fig.add_subplot(gs[1, 0])
+    categories = [RiskCategory.BLOCKED_WORK, RiskCategory.BURN_RATE, RiskCategory.CHRONIC_CARRYOVER, RiskCategory.DEPENDENCY]
+    severities = [RiskSeverity.CRITICAL, RiskSeverity.HIGH, RiskSeverity.MEDIUM, RiskSeverity.LOW]
+    matrix = np.zeros((len(severities), len(categories)))
+    for s in risk_report.project_summaries:
+        for r in s.risks:
+            ci = categories.index(r.category) if r.category in categories else -1
+            si = severities.index(r.severity) if r.severity in severities else -1
+            if ci >= 0 and si >= 0:
+                matrix[si][ci] += 1
+    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("pmo", ["#FFFFFF", COLOURS["amber_light"], COLOURS["amber"], COLOURS["red"]])
+    ax3.imshow(matrix, cmap=cmap, aspect="auto", vmin=0)
+    ax3.set_xticks(np.arange(4))
+    ax3.set_yticks(np.arange(4))
+    ax3.set_xticklabels(["Blocked", "Burn Rate", "Carry-Over", "Dependency"], fontsize=6)
+    ax3.set_yticklabels(["Critical", "High", "Medium", "Low"], fontsize=6)
+    for i in range(4):
+        for j in range(4):
+            val = int(matrix[i][j])
+            if val > 0:
+                ax3.text(j, i, str(val), ha="center", va="center", fontsize=10, fontweight="bold",
+                         color="white" if val >= 3 else COLOURS["dark_text"])
+    ax3.set_title("Risk Heatmap", fontsize=9, fontweight="bold", color=COLOURS["primary"], pad=6)
+
+    # 4. Benefits drift (bottom-right)
+    ax4 = fig.add_subplot(gs[1, 1])
+    if benefit_report and any(s.total_expected > 0 for s in benefit_report.project_summaries):
+        bs = [s for s in benefit_report.project_summaries if s.total_expected > 0]
+        bs = sorted(bs, key=lambda s: -s.drift_pct)[:8]
+        bnames2 = [s.project_name.split(" - ")[0][:12] if " - " in s.project_name else s.project_name[:12] for s in bs]
+        drifts = [s.drift_pct * 100 for s in bs]
+        bcolors = [RAG_COLOURS.get(s.drift_rag, COLOURS["grey"]) for s in bs]
+        ax4.barh(bnames2, drifts, color=bcolors, height=0.5, edgecolor="white")
+        ax4.axvline(x=15, color=COLOURS["amber"], linestyle="--", linewidth=0.6, alpha=0.5)
+        ax4.axvline(x=30, color=COLOURS["red"], linestyle="--", linewidth=0.6, alpha=0.5)
+        ax4.invert_yaxis()
+        ax4.set_xlabel("Drift %", fontsize=6, color=COLOURS["dark_text"])
+        ax4.set_title("Benefits Drift", fontsize=9, fontweight="bold", color=COLOURS["primary"], pad=6)
+    else:
+        ax4.text(0.5, 0.5, "No benefits data", ha="center", va="center", fontsize=8, color=COLOURS["dark_grey"])
+        ax4.set_axis_off()
+    _style_ax(ax4)
+    ax4.tick_params(labelsize=6)
+
+    fig.suptitle("", fontsize=1)  # No title — already in DOCX header
+    return _save(fig, "portfolio_dashboard_compact", dpi=200)
