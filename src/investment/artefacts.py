@@ -43,6 +43,16 @@ def generate_investment_report(
     _add_header_bar(doc, brand, _h(brand, "investment_title", "Portfolio Investment Summary"))
     _maybe_add_logo(doc, brand)
 
+    # ROI vs Risk bubble chart
+    try:
+        from src.charts import chart_roi_vs_risk
+        roi_chart = chart_roi_vs_risk(investment_report)
+        doc.add_picture(str(roi_chart), width=Inches(5.5))
+        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        doc.add_paragraph()
+    except Exception:
+        pass
+
     # Investment dashboard
     _add_investment_dashboard(doc, investment_report, brand)
 

@@ -73,6 +73,16 @@ def generate_board_briefing(
     from src.insights import generate_executive_summary
     exec_summary = generate_executive_summary(report, benefit_report, investment_report)
     _add_exec_action_box(doc, exec_summary, brand)
+    # Portfolio dashboard chart
+    try:
+        from src.charts import chart_portfolio_dashboard
+        chart_path = chart_portfolio_dashboard(report, benefit_report, investment_report)
+        doc.add_picture(str(chart_path), width=Inches(6.5))
+        last_para = doc.paragraphs[-1]
+        last_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        last_para.paragraph_format.space_after = Pt(6)
+    except Exception:
+        pass  # Fall back to text dashboard if charts fail
     _add_portfolio_dashboard(doc, report, brand)
     _add_section_heading(doc, brand, _h(brand, "project_table", "Project Overview"))
     _add_project_rag_table(doc, report, brand)
@@ -104,12 +114,37 @@ def generate_steering_pack(
     _add_exec_action_box(doc, exec_summary, brand)
     _add_section_heading(doc, brand, _h(brand, "exec_summary", "Executive Summary"))
     _add_exec_summary(doc, report, brand)
+    # Charts: RAG donut + budget
+    try:
+        from src.charts import chart_rag_donut, chart_budget_vs_spend
+        from docx.shared import Inches as _Inches
+        chart1 = chart_rag_donut(report)
+        chart2 = chart_budget_vs_spend(report)
+        # Side-by-side via table
+        ct = doc.add_table(rows=1, cols=2)
+        ct.alignment = WD_TABLE_ALIGNMENT.LEFT
+        _remove_table_borders(ct)
+        ct.rows[0].cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        ct.rows[0].cells[0].paragraphs[0].add_run().add_picture(str(chart1), width=_Inches(3))
+        ct.rows[0].cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        ct.rows[0].cells[1].paragraphs[0].add_run().add_picture(str(chart2), width=_Inches(3.2))
+        doc.add_paragraph()
+    except Exception:
+        pass
     _add_portfolio_dashboard(doc, report, brand)
     _add_section_heading(doc, brand, _h(brand, "project_table", "Project Overview"))
     _add_project_rag_table(doc, report, brand, detailed=True)
     _add_section_heading(doc, brand, _h(brand, "top_risks", "Top Portfolio Risks"))
     for i, risk in enumerate(_get_top_n_risks(report, 5), 1):
         _add_risk_card(doc, risk, index=i, include_mitigation=True)
+    # Risk heatmap chart
+    try:
+        from src.charts import chart_risk_heatmap
+        heatmap = chart_risk_heatmap(report)
+        doc.add_picture(str(heatmap), width=Inches(4))
+        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    except Exception:
+        pass
     _add_section_heading(doc, brand, _h(brand, "decisions", "Recommended Decisions"))
     for i, d in enumerate(_generate_decisions(report, 3), 1):
         _add_decision_item(doc, d, i, brand)

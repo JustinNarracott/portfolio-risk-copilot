@@ -40,6 +40,17 @@ def generate_benefits_report(
     _add_header_bar(doc, brand, _h(brand, "benefits_title", "Benefits Realisation Report"))
     _maybe_add_logo(doc, brand)
 
+    # Benefits charts
+    try:
+        from src.charts import chart_benefits_waterfall, chart_benefits_drift
+        from docx.shared import Inches as _Inches
+        wf = chart_benefits_waterfall(benefit_report)
+        doc.add_picture(str(wf), width=_Inches(5))
+        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        doc.add_paragraph()
+    except Exception:
+        pass
+
     # Benefits dashboard
     _add_benefits_dashboard(doc, benefit_report, brand)
 
@@ -58,6 +69,15 @@ def generate_benefits_report(
     drifting = [s for s in benefit_report.project_summaries if s.drift_pct > 0.15]
     if drifting:
         _add_section_heading(doc, brand, "Benefits Drift Analysis")
+        # Drift chart
+        try:
+            from src.charts import chart_benefits_drift
+            drift_chart = chart_benefits_drift(benefit_report)
+            doc.add_picture(str(drift_chart), width=Inches(5))
+            doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            doc.add_paragraph()
+        except Exception:
+            pass
         for s in sorted(drifting, key=lambda x: -x.drift_pct):
             p = doc.add_paragraph()
             p.paragraph_format.space_after = Pt(6)
