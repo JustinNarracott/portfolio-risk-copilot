@@ -208,8 +208,7 @@ def chart_risk_heatmap(report: PortfolioRiskReport) -> Path:
         for j in range(len(categories)):
             val = int(matrix[i][j])
             if val > 0:
-                text_color = "white" if val >= 3 else COLOURS["dark_text"]
-                ax.text(j, i, str(val), ha="center", va="center", fontsize=12, fontweight="bold", color=text_color)
+                ax.text(j, i, str(val), ha="center", va="center", fontsize=12, fontweight="bold", color=COLOURS["dark_text"])
 
     ax.set_title("Risk Heatmap", fontsize=11, fontweight="bold", color=COLOURS["primary"], pad=10)
     fig.tight_layout()
@@ -552,7 +551,7 @@ def chart_portfolio_dashboard(
             val = int(matrix[i][j])
             if val > 0:
                 ax3.text(j, i, str(val), ha="center", va="center", fontsize=11, fontweight="bold",
-                         color="white" if val >= 3 else COLOURS["dark_text"])
+                         color=COLOURS["dark_text"])
     ax3.set_title("Risk Heatmap", fontsize=10, fontweight="bold", color=COLOURS["primary"], pad=8)
 
     # 4. Timeline (bottom-right) or Benefits drift
@@ -687,7 +686,7 @@ def chart_portfolio_dashboard_compact(
             val = int(matrix[i][j])
             if val > 0:
                 ax3.text(j, i, str(val), ha="center", va="center", fontsize=10, fontweight="bold",
-                         color="white" if val >= 3 else COLOURS["dark_text"])
+                         color=COLOURS["dark_text"])
     ax3.set_title("Risk Heatmap", fontsize=9, fontweight="bold", color=COLOURS["primary"], pad=6)
 
     # 4. Benefits drift (bottom-right)
