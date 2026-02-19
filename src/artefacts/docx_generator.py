@@ -85,6 +85,7 @@ def generate_board_briefing(
 
 def generate_steering_pack(
     report: PortfolioRiskReport, brand: BrandConfig | None = None, output_path: str | Path | None = None,
+    benefit_report=None,
 ) -> Path:
     """Generate a 2-3 page steering committee pack DOCX."""
     brand = brand or BrandConfig()
@@ -103,6 +104,10 @@ def generate_steering_pack(
     _add_section_heading(doc, brand, _h(brand, "decisions", "Recommended Decisions"))
     for i, d in enumerate(_generate_decisions(report, 3), 1):
         _add_decision_item(doc, d, i, brand)
+    # Benefits section (if benefit data available)
+    if benefit_report is not None:
+        from src.benefits.artefacts import add_benefits_to_steering
+        add_benefits_to_steering(doc, benefit_report, brand)
     _add_section_heading(doc, brand, _h(brand, "talking_points", "Talking Points for Discussion"))
     for pt in _generate_talking_points(report):
         p = doc.add_paragraph(style="List Bullet")

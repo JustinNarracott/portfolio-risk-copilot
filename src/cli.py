@@ -29,8 +29,11 @@ from src.artefacts.docx_generator import (
     generate_project_status_pack,
 )
 from src.artefacts.pptx_generator import generate_board_slides
+from src.benefits.parser import parse_benefits, Benefit
+from src.benefits.calculator import analyse_benefits, PortfolioBenefitReport
+from src.benefits.artefacts import generate_benefits_report
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 class Session:
@@ -39,6 +42,8 @@ class Session:
     def __init__(self) -> None:
         self.projects: list[Project] = []
         self.report: PortfolioRiskReport | None = None
+        self.benefit_report: PortfolioBenefitReport | None = None
+        self.benefits: list[Benefit] = []
         self.graph: DependencyGraph | None = None
         self.brand: BrandConfig = BrandConfig()
         self.reference_date: date = date.today()
@@ -79,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # pmo-brief
     brief_parser = subparsers.add_parser("brief", help="Generate stakeholder briefing")
-    brief_parser.add_argument("type", choices=["board", "steering", "project", "all"], help="Briefing type")
+    brief_parser.add_argument("type", choices=["board", "steering", "project", "benefits", "all"], help="Briefing type")
     brief_parser.add_argument("--logo", type=str, help="Path to logo image (PNG/JPG)")
     brief_parser.add_argument("--colour", type=str, help="Primary brand colour (hex, e.g. 1F4E79)")
     brief_parser.add_argument("--output-dir", type=str, help="Output directory")
@@ -157,6 +162,36 @@ def cmd_ingest(args) -> int:
     _session.graph = build_dependency_graph(deduplicated)
     _session.report = analyse_portfolio(deduplicated, top_n=5, reference_date=_session.reference_date)
 
+    # Attempt to parse benefit files (files that failed project parsing may be benefit trackers)
+    _session.benefits = []
+    for f in sorted(files):
+        try:
+            benefits = parse_benefits(f)
+            # Quality gate: only accept as benefit file if ≥1 benefit has expected_value > 0
+            if benefits and any(b.expected_value > 0 for b in benefits):
+                # Further gate: must have recognisable benefit columns (not just project data)
+                has_benefit_value = sum(1 for b in benefits if b.expected_value > 0)
+                if has_benefit_value / len(benefits) >= 0.3:  # At least 30% have values
+                    _session.benefits.extend(benefits)
+        except Exception:
+            pass
+
+    # Deduplicate benefits by project + name
+    seen_bens: set[str] = set()
+    unique_benefits: list[Benefit] = []
+    for b in _session.benefits:
+        key = f"{b.project_name}|{b.name}"
+        if key not in seen_bens:
+            seen_bens.add(key)
+            unique_benefits.append(b)
+    _session.benefits = unique_benefits
+
+    # Run benefits analysis if we have benefit data
+    if _session.benefits:
+        _session.benefit_report = analyse_benefits(
+            _session.benefits, _session.report, _session.reference_date
+        )
+
     if hasattr(args, "output_dir") and args.output_dir:
         _session.output_dir = Path(args.output_dir)
 
@@ -164,6 +199,10 @@ def cmd_ingest(args) -> int:
     print(f"  Portfolio RAG: {_session.report.portfolio_rag}")
     print(f"  Projects at risk: {_session.report.projects_at_risk}/{len(deduplicated)}")
     print(f"  Total risks identified: {_session.report.total_risks}")
+    if _session.benefits:
+        print(f"  Benefits tracked: {len(_session.benefits)} across {len({b.project_name for b in _session.benefits})} projects")
+        if _session.benefit_report:
+            print(f"  Portfolio benefits drift: {_session.benefit_report.portfolio_drift_pct:.0%} ({_session.benefit_report.portfolio_drift_rag})")
     print(f"\nRun 'pmo-copilot risks' for details or 'pmo-copilot brief <type>' to generate artefacts.")
 
     return 0
@@ -251,12 +290,26 @@ def cmd_brief(args) -> int:
         generated.append(p2)
 
     if args.type in ("steering", "all"):
-        p = generate_steering_pack(report, brand=brand, output_path=output_dir / "steering-committee-pack.docx")
+        p = generate_steering_pack(
+            report, brand=brand, output_path=output_dir / "steering-committee-pack.docx",
+            benefit_report=_session.benefit_report,
+        )
         generated.append(p)
 
     if args.type in ("project", "all"):
         p = generate_project_status_pack(report, brand=brand, output_path=output_dir / "project-status-pack.docx")
         generated.append(p)
+
+    if args.type in ("benefits", "all"):
+        if _session.benefit_report:
+            p = generate_benefits_report(
+                _session.benefit_report, brand=brand,
+                output_path=output_dir / "benefits-report.docx",
+            )
+            generated.append(p)
+        elif args.type == "benefits":
+            print("No benefit data loaded. Ensure benefit tracker CSV is in the ingested folder.")
+            return 1
 
     print(f"✓ Generated {len(generated)} artefact(s):")
     for g in generated:
