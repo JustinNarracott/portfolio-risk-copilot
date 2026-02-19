@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated outputs
+output/
+*.docx.tmp
+*.pptx.tmp
+
+# Environment variables
+.env
+.env.local

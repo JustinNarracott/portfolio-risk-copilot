@@ -1,0 +1,49 @@
+Project,Project Status,Start Date,End Date,Budget,Actual Spend,Task Name,Task Status,Priority,Assignee,Sprint,Previous Sprints,Comments
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Design system architecture,Done,High,Alice Chen,Sprint 3,,Completed ahead of schedule
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Build user authentication API,In Progress,High,Bob Martinez,Sprint 5,,Blocked by infrastructure team - no ETA provided
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Implement payment gateway,Blocked,Critical,Charlie Kim,Sprint 5,Sprint 3;Sprint 4,Blocked by third-party vendor API changes. Waiting for vendor response since 2026-01-20
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Frontend dashboard build,In Progress,High,Diana Patel,Sprint 5,,Depends on API completion from Bob
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Write integration tests,To Do,Medium,Eve Johnson,Sprint 5,,Waiting for authentication API and payment gateway to be complete
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Database migration scripts,Done,High,Frank Liu,Sprint 4,,
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Performance load testing,To Do,Medium,Alice Chen,Sprint 5,,Prerequisite: all APIs must be deployed to staging
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Security audit,To Do,High,Bob Martinez,Sprint 6,,Depends on authentication API completion
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,User acceptance testing,To Do,High,Charlie Kim,Sprint 6,,
+Alpha,In Progress,2026-01-06,2026-06-30,100000,45000,Documentation update,To Do,Low,Diana Patel,Sprint 6,,
+Beta,Planning,2026-02-01,2026-08-31,150000,10000,Requirements gathering,Done,High,Grace Wilson,Sprint 2,,
+Beta,Planning,2026-02-01,2026-08-31,150000,10000,Stakeholder interviews,Done,High,Henry Obi,Sprint 2,,
+Beta,Planning,2026-02-01,2026-08-31,150000,10000,Design mockups,In Progress,High,Grace Wilson,Sprint 3,,Client feedback pending - slow response from sponsor
+Beta,Planning,2026-02-01,2026-08-31,150000,10000,Technical feasibility study,In Progress,Medium,Henry Obi,Sprint 3,,Waiting for infrastructure team capacity assessment
+Beta,Planning,2026-02-01,2026-08-31,150000,10000,Data model design,To Do,High,Grace Wilson,Sprint 4,,Depends on technical feasibility study
+Beta,Planning,2026-02-01,2026-08-31,150000,10000,API specification,To Do,Medium,Henry Obi,Sprint 4,,
+Beta,Planning,2026-02-01,2026-08-31,150000,10000,Vendor selection,To Do,High,Grace Wilson,Sprint 4,,Blocked by procurement process - budget approval pending
+Beta,Planning,2026-02-01,2026-08-31,150000,10000,Environment setup,To Do,Medium,Henry Obi,Sprint 5,,
+Gamma,At Risk,2025-09-01,2026-04-30,200000,185000,Core platform migration,In Progress,Critical,Ivan Torres,Sprint 8,Sprint 4;Sprint 5;Sprint 6;Sprint 7,Repeatedly delayed due to legacy system complexity. Original estimate was Sprint 5 completion
+Gamma,At Risk,2025-09-01,2026-04-30,200000,185000,Data migration pipeline,In Progress,Critical,Julia Park,Sprint 8,Sprint 6;Sprint 7,Blocked by core platform migration. Cannot proceed until platform is stable
+Gamma,At Risk,2025-09-01,2026-04-30,200000,185000,User training material,On Hold,Medium,Karen Wright,Sprint 8,,On hold until migration is complete
+Gamma,At Risk,2025-09-01,2026-04-30,200000,185000,Legacy system decommission,To Do,High,Ivan Torres,Sprint 9,,Depends on successful data migration validation
+Gamma,At Risk,2025-09-01,2026-04-30,200000,185000,Rollback plan documentation,Done,High,Julia Park,Sprint 7,,
+Gamma,At Risk,2025-09-01,2026-04-30,200000,185000,Performance benchmarking,To Do,Medium,Karen Wright,Sprint 9,,Prerequisite: core platform migration complete
+Gamma,At Risk,2025-09-01,2026-04-30,200000,185000,Compliance verification,To Do,Critical,Ivan Torres,Sprint 9,,Waiting for legal team review
+Gamma,At Risk,2025-09-01,2026-04-30,200000,185000,Go-live checklist,To Do,High,Julia Park,Sprint 10,,
+Delta,In Progress,2026-01-15,2026-07-31,80000,22000,Mobile app wireframes,Done,High,Leo Nakamura,Sprint 3,,
+Delta,In Progress,2026-01-15,2026-07-31,80000,22000,iOS prototype build,In Progress,High,Mia Santos,Sprint 5,,
+Delta,In Progress,2026-01-15,2026-07-31,80000,22000,Android prototype build,In Progress,High,Leo Nakamura,Sprint 5,,
+Delta,In Progress,2026-01-15,2026-07-31,80000,22000,Backend API development,In Progress,High,Mia Santos,Sprint 5,Sprint 4,Some carry-over from Sprint 4 due to scope creep
+Delta,In Progress,2026-01-15,2026-07-31,80000,22000,Push notification service,To Do,Medium,Leo Nakamura,Sprint 6,,Depends on backend API
+Delta,In Progress,2026-01-15,2026-07-31,80000,22000,User analytics integration,To Do,Low,Mia Santos,Sprint 6,,
+Delta,In Progress,2026-01-15,2026-07-31,80000,22000,Beta testing programme,To Do,High,Leo Nakamura,Sprint 7,,
+Delta,In Progress,2026-01-15,2026-07-31,80000,22000,App store submission prep,To Do,Medium,Mia Santos,Sprint 8,,
+Epsilon,In Progress,2025-11-01,2026-03-31,60000,58000,Regulatory compliance audit,In Progress,Critical,Nora Bell,Sprint 6,Sprint 4;Sprint 5,Repeatedly extended. Auditor flagged 12 additional items in Sprint 5
+Epsilon,In Progress,2025-11-01,2026-03-31,60000,58000,Policy document updates,In Progress,High,Oscar Ruiz,Sprint 6,Sprint 5,Waiting for compliance audit findings to finalise
+Epsilon,In Progress,2025-11-01,2026-03-31,60000,58000,Staff training rollout,On Hold,High,Nora Bell,Sprint 6,,On hold - blocked by policy document completion
+Epsilon,In Progress,2025-11-01,2026-03-31,60000,58000,System controls implementation,In Progress,Critical,Oscar Ruiz,Sprint 6,,Depends on audit recommendations
+Epsilon,In Progress,2025-11-01,2026-03-31,60000,58000,External audit scheduling,To Do,High,Nora Bell,Sprint 7,,Cannot schedule until internal audit complete
+Epsilon,In Progress,2025-11-01,2026-03-31,60000,58000,Board compliance report,To Do,Critical,Oscar Ruiz,Sprint 7,,Waiting for all audit streams to complete
+Zeta,In Progress,2026-01-20,2026-09-30,120000,15000,Market research phase,Done,High,Priya Sharma,Sprint 2,,
+Zeta,In Progress,2026-01-20,2026-09-30,120000,15000,Competitive analysis,Done,Medium,Quinn Foster,Sprint 2,,
+Zeta,In Progress,2026-01-20,2026-09-30,120000,15000,Product strategy document,In Progress,High,Priya Sharma,Sprint 3,,
+Zeta,In Progress,2026-01-20,2026-09-30,120000,15000,MVP feature prioritisation,In Progress,High,Quinn Foster,Sprint 3,,
+Zeta,In Progress,2026-01-20,2026-09-30,120000,15000,UX research interviews,To Do,Medium,Priya Sharma,Sprint 4,,
+Zeta,In Progress,2026-01-20,2026-09-30,120000,15000,Technical architecture design,To Do,High,Quinn Foster,Sprint 4,,Depends on product strategy finalisation
+Zeta,In Progress,2026-01-20,2026-09-30,120000,15000,Prototype build,To Do,High,Priya Sharma,Sprint 5,,
+Zeta,In Progress,2026-01-20,2026-09-30,120000,15000,User testing round 1,To Do,Medium,Quinn Foster,Sprint 6,,

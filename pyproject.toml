@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "portfolio-risk-copilot"
+version = "0.1.0"
+description = "Claude Opus-powered portfolio risk analysis and exec briefing generator for PMOs"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Your Name"},
+]
+keywords = ["pmo", "project-management", "risk-analysis", "portfolio", "claude", "ai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Scheduling",
+]
+
+dependencies = [
+    "pandas>=2.1.0",
+    "openpyxl>=3.1.0",
+    "python-docx>=1.1.0",
+    "python-pptx>=0.6.23",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-v --tb=short --cov=src --cov-report=term-missing"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]

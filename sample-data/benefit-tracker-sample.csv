@@ -1,0 +1,7 @@
+Project,Expected Annual Benefit,Realised Benefit to Date,Benefit Status,Benefit Category,Benefit Owner,Target Realisation Date,Notes
+Alpha,500000,0,Not Started,Revenue - New Product,Alice Chen,2026-09-30,Benefits contingent on Q2 launch date
+Beta,750000,0,Not Started,Cost Reduction - Process Automation,Grace Wilson,2027-01-31,Requires full platform rollout before benefits realise
+Gamma,300000,150000,Partial,Cost Avoidance - Legacy Decommission,Ivan Torres,2026-06-30,50% realised from Phase 1 decommission. Remainder at risk due to migration delays
+Delta,200000,0,Not Started,Revenue - Mobile Channel,Leo Nakamura,2026-12-31,Conservative estimate. Upside potential if app store ratings >4.5
+Epsilon,0,0,At Risk,Risk Mitigation - Regulatory Compliance,Nora Bell,2026-03-31,No direct financial benefit but non-compliance penalty estimated at 2M. Timeline at risk
+Zeta,1000000,0,Not Started,Revenue - New Market Entry,Priya Sharma,2027-06-30,High uncertainty. Dependent on market validation in Sprint 4-5
