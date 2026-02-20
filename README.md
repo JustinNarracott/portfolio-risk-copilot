@@ -236,6 +236,6 @@ MIT — see [LICENSE](LICENSE).
 
 ## About
 
-Built by [Justin Narracott](https://www.linkedin.com/in/justinnarracott/) — PMO consultant, AI governance practitioner, and founder of [SignalBreak.io](https://signalbreak.io) and [Step5Consult](https://step5consult.co.uk).
+Built by [Justin Narracott](https://www.linkedin.com/in/justinnarracott/) — PMO consultant, AI governance practitioner, and founder of [SignalBreak.io](https://signalbreak.io).
 
-Built with Claude Opus 4.6 in 5.5 hours (originally estimated at 240 hours / 12 weeks). Follow the journey on [LinkedIn](https://www.linkedin.com/in/justinnarracott/) and [Twitter/X](https://x.com/JustinNarracott).
+Built with Claude Opus 4.6 in 5.5 hours (originally estimated at 240 hours / 12 weeks). Follow the journey on [LinkedIn](https://www.linkedin.com/in/justinnarracott/).
