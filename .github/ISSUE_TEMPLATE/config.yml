@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: User Guide
+    url: https://github.com/JustinNarracott/portfolio-risk-copilot/blob/main/DOCS.md
+    about: Check the user guide before opening an issue — your question might already be answered.
+  - name: General Questions
+    url: https://github.com/JustinNarracott/portfolio-risk-copilot/discussions
+    about: Ask general questions in Discussions rather than opening an issue.

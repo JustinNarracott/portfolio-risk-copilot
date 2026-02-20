@@ -1,0 +1,78 @@
+name: Bug Report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill in the details below so we can reproduce and fix it.
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Which version are you running?
+      placeholder: "e.g. 1.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: What are you running on?
+      options:
+        - Windows (Cowork plugin)
+        - Windows (CLI)
+        - macOS (Cowork plugin)
+        - macOS (CLI)
+        - Linux (CLI)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: "When I run `/brief all`, the benefits report is missing the waterfall chart..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: What should have happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce the issue?
+      value: |
+        1. Ingest data: `python -m src.cli ingest ./my-data`
+        2. Generate briefings: `python -m src.cli brief all`
+        3. Open the generated file...
+    validations:
+      required: true
+
+  - type: textarea
+    id: data
+    attributes:
+      label: Data details
+      description: What kind of data are you using? (Don't share confidential data — describe the shape instead.)
+      placeholder: "CSV export from Jira, ~200 rows, 8 projects, includes benefits register"
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output / logs
+      description: Paste any error messages or tracebacks here.
+      render: shell
+    validations:
+      required: false

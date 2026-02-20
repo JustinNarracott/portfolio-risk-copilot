@@ -1,0 +1,59 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Got an idea for the Portfolio Risk Copilot? We'd love to hear it.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the pain point or workflow gap this would address.
+      placeholder: "I currently have to manually combine the board briefing and benefits report because my steering committee wants both in one document..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How do you think this should work?
+      placeholder: "A new brief type like `brief combined` that merges the board briefing with the benefits summary in a single DOCX..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What area does this relate to?
+      options:
+        - Data ingestion (new PM tool formats, column mapping)
+        - Risk detection (new risk patterns, thresholds)
+        - Scenario simulation (new scenario types, modelling)
+        - Artefact generation (new document types, charts, formatting)
+        - Benefits / investment analysis
+        - Cowork plugin (commands, skills, UX)
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Have you tried any workarounds or considered other approaches?
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any screenshots, sample data descriptions, or related issues?
+    validations:
+      required: false
