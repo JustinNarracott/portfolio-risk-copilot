@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "portfolio-risk-copilot"
-version = "0.1.0"
+version = "1.2.0"
 description = "Claude Opus-powered portfolio risk analysis and exec briefing generator for PMOs"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.11"
 authors = [
-    {name = "Your Name"},
+    {name = "Justin Narracott", email = "justin@signalbreak.io"},
 ]
 keywords = ["pmo", "project-management", "risk-analysis", "portfolio", "claude", "ai"]
 classifiers = [
@@ -27,6 +27,7 @@ dependencies = [
     "openpyxl>=3.1.0",
     "python-docx>=1.1.0",
     "python-pptx>=0.6.23",
+    "matplotlib>=3.8.0",
 ]
 
 [project.optional-dependencies]

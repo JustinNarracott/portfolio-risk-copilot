@@ -2,24 +2,47 @@
 
 **AI-powered decision intelligence for PMOs.** Turn messy project data into exec-ready briefings, proactive risk analysis, benefits tracking, and portfolio "what-if" scenarios — in under 90 seconds.
 
-> *"Before this, I spent 2-3 days per month assembling board packs from Jira exports and Excel trackers. Now I upload our data, run one command, and have an exec-ready briefing in 90 seconds."*
+Built with [Claude Opus 4.6](https://www.anthropic.com) as a [Cowork](https://claude.com/product/cowork) plugin. Free, open-source, and 100% local — your data never leaves your machine.
+
+> *"Before this, I spent 2–3 days per month assembling board packs from Jira exports and Excel trackers. Now I upload our data, run one command, and have an exec-ready briefing in 90 seconds."*
+
+---
 
 ## What It Does
 
-Upload your Jira/DevOps/Smartsheet exports and benefits register. Get back:
+Upload your Jira/DevOps/Smartsheet exports and benefits register. Get back **8 publication-quality documents** with embedded charts:
 
 | Artefact | What's in it |
 |----------|-------------|
-| **Board Briefing** (DOCX + PPTX) | Executive action summary, portfolio dashboard, top 3 risks, recommended decisions |
-| **Steering Committee Pack** (DOCX) | Full narrative with risk commentary, benefits & value section, talking points |
+| **Portfolio Dashboard** (DOCX) | 2-page CXO overview: KPI cards, composite chart, RAG table, key decisions |
+| **Board Briefing** (DOCX + PPTX) | Executive action summary, dashboard chart, top 3 risks, recommended decisions |
+| **Steering Committee Pack** (DOCX) | Full narrative with RAG donut, budget bars, risk heatmap, benefits section, talking points |
 | **Project Status Pack** (DOCX) | Per-project RAG status, risks, forecast deltas, action items |
-| **Benefits Report** (DOCX) | Realisation rates, drift analysis, benefits at risk, recommendations |
-| **Investment Summary** (DOCX) | ROI league table, Invest/Hold/Divest recommendations, cost-to-complete |
+| **Benefits Report** (DOCX) | Realisation rates, waterfall chart, drift analysis, recommendations |
+| **Investment Summary** (DOCX) | ROI league table, Invest/Hold/Divest recommendations, bubble chart |
 | **Decision Log** (DOCX) | Structured audit trail of portfolio decisions with options and rationale |
 
 Every document opens with a punchy **executive action summary** — the paragraph a CXO reads on their phone at 7am.
 
+### Charts
+
+All documents include publication-quality charts (powered by matplotlib):
+
+- **RAG donut** — portfolio health at a glance
+- **Budget vs spend bars** — overspend highlighted in red
+- **Risk heatmap** — severity × category matrix
+- **Benefits waterfall** — Expected → Realised → At Risk → Adjusted
+- **Benefits drift bars** — per-project with 15%/30% threshold lines
+- **ROI bubble chart** — ROI vs Risk, bubble size = budget, colour = Invest/Hold/Divest
+- **Composite dashboard** — 2×2 grid combining the key views
+
+Charts degrade gracefully to text-only if matplotlib is not installed.
+
+---
+
 ## Quick Start
+
+### CLI
 
 ```bash
 # Clone
@@ -29,14 +52,35 @@ cd portfolio-risk-copilot
 # Install dependencies
 pip install -r requirements.txt
 
-# Run with sample data
-python -m src.cli ingest ./sample-data
-python -m src.cli risks
-python -m src.cli scenario "delay Alpha by 3 months"
-python -m src.cli brief all --output-dir ./output
+# Run with sample data (single session)
+python -c "
+from src.cli import main, _session
+from datetime import date
+_session.reference_date = date.today()
+main(['ingest', './sample-data'])
+main(['risks'])
+main(['brief', 'all', '--output-dir', './output'])
+"
 ```
 
-That's it. Seven documents in your `./output` folder.
+Eight documents in your `./output` folder.
+
+### Cowork Plugin
+
+1. Download/clone this repository
+2. Zip the folder (exclude `.git`, `.venv`, `__pycache__`)
+3. Open Claude Desktop → Cowork → Plugins → **Upload plugin** → select the zip
+4. Use the slash commands:
+
+```
+/help                              — Quick-start guide and reference
+/ingest <folder>                   — Load and analyse project data
+/risks                             — Show top risks per project
+/scenario "delay Alpha by 3 months" — Model a what-if scenario
+/brief all --output-dir ./output   — Generate all 8 documents
+```
+
+---
 
 ## Commands
 
@@ -51,8 +95,9 @@ That's it. Seven documents in your `./output` folder.
 | `brief project` | Generate per-project status packs (DOCX) |
 | `brief benefits` | Generate benefits realisation report (DOCX) |
 | `brief investment` | Generate portfolio investment summary (DOCX) |
+| `brief dashboard` | Generate 2-page portfolio dashboard (DOCX) |
 | `brief decisions` | Generate decision log (DOCX) |
-| `brief all` | Generate all artefacts |
+| `brief all` | Generate all 8 artefacts |
 
 ### Options
 
@@ -62,6 +107,8 @@ That's it. Seven documents in your `./output` folder.
 --colour 1F4E79             # Set primary brand colour (hex)
 ```
 
+---
+
 ## What Data Do I Need?
 
 **Minimum:** A CSV/Excel export from your PM tool with columns for project name, task name, and task status.
@@ -70,7 +117,20 @@ That's it. Seven documents in your `./output` folder.
 
 **For benefits tracking:** A separate CSV/Excel with project name, expected benefit value, realised value, and status.
 
-The parser handles messy column names, mixed date formats, and missing data gracefully. It supports exports from Jira, Azure DevOps, Smartsheet, MS Project, and generic trackers.
+The parser handles messy column names, mixed date formats, and missing data gracefully. It supports exports from Jira, Azure DevOps, Smartsheet, MS Project, Monday.com, and generic trackers.
+
+### Supported Export Formats
+
+| Source | How to export |
+|--------|-------------|
+| **Jira** | Filters → Export → CSV (include all fields) |
+| **Azure DevOps** | Queries → Export to CSV |
+| **Smartsheet** | File → Export → CSV or Excel |
+| **Monday.com** | Board menu → Export → Excel |
+| **MS Project** | File → Save As → CSV |
+| **Generic** | Any CSV/Excel with project name, task name, task status columns |
+
+---
 
 ## Sample Data
 
@@ -79,8 +139,11 @@ The `sample-data/` folder contains a realistic 11-project portfolio:
 - **portfolio-export.csv** — 11 projects, 69 tasks, mixed health states
 - **benefits-register.csv** — 21 benefits across 11 projects
 - **jira-export-sample.csv** — 6-project Jira export format
+- **jira-export-sample.json** — Same data in JSON format
 
 Projects include platform rebuilds, mobile launches, compliance programmes, office relocations, security upgrades, and an on-hold HR system — the kind of portfolio a real PMO manages.
+
+---
 
 ## Risk Detection
 
@@ -98,11 +161,11 @@ Every risk gets a plain-English explanation and suggested mitigation. No jargon,
 
 Model portfolio changes in natural language:
 
-```bash
-python -m src.cli scenario "delay Alpha by 3 months"
-python -m src.cli scenario "cut Beta budget by 30%"
-python -m src.cli scenario "remove Delta from portfolio"
-python -m src.cli scenario "increase Zeta scope by 25%"
+```
+"delay Alpha by 3 months"
+"cut Beta budget by 30%"
+"remove Delta from portfolio"
+"increase Zeta scope by 25%"
 ```
 
 Each scenario produces a before/after impact summary with cascade effects on dependent projects and recommendations.
@@ -113,7 +176,7 @@ Upload a benefits register and get:
 
 - **Realisation rates** per project and across the portfolio
 - **Benefits drift detection** — flags when expected value is eroding
-- **Drift RAG** — Green (<15%), Amber (15-30%), Red (>30%)
+- **Drift RAG** — Green (<15%), Amber (15–30%), Red (>30%)
 - **CXO-readable explanations** — "Alpha was forecast to deliver £500k. Adjusted estimate is £320k — 36% drift."
 - **Recommendations** — escalate, protect, or write down
 
@@ -126,52 +189,52 @@ See your portfolio through a financial lens:
 - **Cost-to-complete** — how much more each project needs
 - **Reallocation opportunities** — where freed budget could go
 
-## Cowork Plugin
-
-This tool is designed to work as a Claude Cowork plugin:
-
-```
-/pmo-ingest ./project-data
-/pmo-risks
-/pmo-scenario "delay Alpha by 1 quarter"
-/pmo-brief all
-```
-
-See `.claude-plugin/marketplace.json` for the plugin manifest.
+---
 
 ## Tech Stack
 
-- **Python 3.11+** — core logic
-- **python-docx** — Word document generation
-- **python-pptx** — PowerPoint generation
-- **pandas** — data parsing
-- **openpyxl** — Excel support
-- **pytest** — 522 tests, 96% coverage
+| Component | Technology |
+|-----------|-----------|
+| **Language** | Python 3.11+ |
+| **Documents** | python-docx, python-pptx |
+| **Charts** | matplotlib |
+| **Data parsing** | pandas, openpyxl |
+| **Testing** | pytest — 522 tests, 94% coverage |
+| **Distribution** | Cowork plugin (GitHub) |
+| **Licence** | MIT |
+
+---
 
 ## Project Status
 
-**v1.1.0** — Sprint 7 complete
+**v1.2.0** — All sprints complete
 
 - ✅ Data ingestion (CSV, JSON, Excel) with flexible column mapping
 - ✅ Risk detection engine (5 categories, severity ranking, plain-English explanations)
-- ✅ Scenario simulator (budget, scope, delay, removal)
-- ✅ 7 artefact types (board, steering, project, benefits, investment, decisions, PPTX)
+- ✅ Scenario simulator (budget, scope, delay, removal with cascade impact)
+- ✅ 8 artefact types with publication-quality embedded charts
 - ✅ Benefits realisation tracking and drift detection
 - ✅ Portfolio investment & ROI analysis with Invest/Hold/Divest
 - ✅ Decision log generator (audit trail from scenarios and analysis)
 - ✅ Executive action summary (the "7am phone check" paragraph)
-- ✅ 522 tests, 96% coverage
+- ✅ Portfolio dashboard (2-page CXO overview with KPI cards and composite chart)
+- ✅ Cowork plugin with 5 slash commands and 3 skills
+- ✅ 522 tests, 94% coverage
+
+---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. Contributions welcome — especially additional PM tool export formats, chart types, and artefact templates.
 
 ## Licence
 
-MIT — see [LICENCE](LICENCE).
+MIT — see [LICENSE](LICENSE).
 
-## Built By
+---
 
-[Your Name] — PMO consultant, AI governance practitioner, and founder of [SignalBreak.io](https://signalbreak.io).
+## About
 
-Built with Claude Opus as part of a 90-day public build sprint. Follow the journey on [Twitter/X](https://twitter.com/yourhandle) and [LinkedIn](https://linkedin.com/in/yourprofile).
+Built by [Justin Narracott](https://www.linkedin.com/in/justinnarracott/) — PMO consultant, AI governance practitioner, and founder of [SignalBreak.io](https://signalbreak.io) and [Step5Consult](https://step5consult.co.uk).
+
+Built with Claude Opus 4.6 in 5.5 hours (originally estimated at 240 hours / 12 weeks). Follow the journey on [LinkedIn](https://www.linkedin.com/in/justinnarracott/) and [Twitter/X](https://x.com/JustinNarracott).

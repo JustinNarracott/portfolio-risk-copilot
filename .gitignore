@@ -32,6 +32,7 @@ desktop.ini
 
 # Generated outputs
 output/
+demo-output/
 *.docx.tmp
 *.pptx.tmp
 

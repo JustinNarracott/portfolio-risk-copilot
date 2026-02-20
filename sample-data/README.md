@@ -4,8 +4,14 @@ These files contain realistic PMO data with deliberate risk patterns baked in fo
 
 ## Files
 
+### `portfolio-export.csv`
+69 tasks across 11 projects — the primary test dataset representing a realistic enterprise portfolio. Includes platform rebuilds, mobile launches, compliance programmes, office relocations, security upgrades, and an on-hold HR system.
+
+### `benefits-register.csv`
+21 benefits across 11 projects with varied realisation states. Includes on-track, at-risk, and delayed benefits for testing drift detection and investment analysis.
+
 ### `jira-export-sample.csv`
-50 tasks across 6 projects. Contains the following known risk patterns:
+50 tasks across 6 projects in Jira export format. Contains the following known risk patterns:
 
 | Project | Known Risks | Pattern Type |
 |---------|------------|--------------|
@@ -17,7 +23,10 @@ These files contain realistic PMO data with deliberate risk patterns baked in fo
 | **Zeta** | Early stage, low spend, no blockers | Low risk (control case) |
 
 ### `benefit-tracker-sample.csv`
-Benefit register for all 6 projects. Key items:
+Benefit register for the 6 Jira-export projects. Key items:
+
+### `jira-export-sample.json`
+Same 6-project dataset as the CSV, in JSON format. Useful for testing JSON ingestion path.
 - **Gamma**: Partial benefit realisation (50%) — remainder at risk due to delays
 - **Epsilon**: No direct financial benefit but £2M non-compliance penalty risk
 - **Zeta**: Highest expected benefit (£1M) but highest uncertainty
