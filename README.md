@@ -42,7 +42,23 @@ Charts degrade gracefully to text-only if matplotlib is not installed.
 
 ## Quick Start
 
-### CLI
+### Option 1: Cowork Plugin (recommended)
+
+1. Download **[portfolio-risk-copilot-v1.2.0.zip](https://github.com/JustinNarracott/portfolio-risk-copilot/releases/latest)** from Releases
+2. Open Claude Desktop → Cowork → Plugins → **Upload plugin** → select the zip
+3. Start using it:
+
+```
+/help                              — Quick-start guide and reference
+/ingest <folder>                   — Load and analyse project data
+/risks                             — Show top risks per project
+/scenario "delay Alpha by 3 months" — Model a what-if scenario
+/brief all --output-dir ./output   — Generate all 8 documents
+```
+
+That's it. No git, no terminal, no setup.
+
+### Option 2: CLI
 
 ```bash
 # Clone
@@ -52,7 +68,7 @@ cd portfolio-risk-copilot
 # Install dependencies
 pip install -r requirements.txt
 
-# Run with sample data (single session)
+# Run with sample data
 python -c "
 from src.cli import main, _session
 from datetime import date
@@ -64,21 +80,6 @@ main(['brief', 'all', '--output-dir', './output'])
 ```
 
 Eight documents in your `./output` folder.
-
-### Cowork Plugin
-
-1. Download/clone this repository
-2. Zip the folder (exclude `.git`, `.venv`, `__pycache__`)
-3. Open Claude Desktop → Cowork → Plugins → **Upload plugin** → select the zip
-4. Use the slash commands:
-
-```
-/help                              — Quick-start guide and reference
-/ingest <folder>                   — Load and analyse project data
-/risks                             — Show top risks per project
-/scenario "delay Alpha by 3 months" — Model a what-if scenario
-/brief all --output-dir ./output   — Generate all 8 documents
-```
 
 ---
 
